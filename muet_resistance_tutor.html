@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applied Physics (EL-112) - Interactive Resistance Tutor | MUET Jamshoro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Temperature curves -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        /* Active tab indicator */
+        .tab-active {
+            border-color: #0d9488;
+            color: #0d9488;
+            background-color: #f0fdfa;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+    <!-- Top MUET Navigation Bar -->
+    <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <!-- Dynamic SVG Crest/Logo of MUET -->
+                    <div class="bg-white p-2 rounded-full shadow-inner flex items-center justify-center w-14 h-14">
+                        <svg class="w-10 h-10 text-indigo-900" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="25" y="15" width="50" height="70" rx="4" stroke="currentColor" stroke-width="6" fill="none"/>
+                            <path d="M25 45H75M25 65H75M50 15V85" stroke="currentColor" stroke-width="4"/>
+                            <circle cx="50" cy="40" r="8" fill="gold"/>
+                            <polygon points="40,30 50,18 60,30" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Mehran University of Engineering & Technology</h1>
+                        <p class="text-xs sm:text-sm text-indigo-200 font-semibold tracking-wider uppercase flex items-center gap-2">
+                            <span>Department of Electrical Engineering</span>
+                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span>Applied Physics (EL-112)</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-indigo-800 text-indigo-100 text-xs px-3 py-1.5 rounded-lg font-mono border border-indigo-700 shadow-sm">Batch: 26EL (I, II & III)</span>
+                    <span class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow transition duration-200 cursor-help" onclick="toggleSyllabusPanel()">
+                        <i class="fa-solid fa-book-open mr-1"></i> Syllabus Info
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification / Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+    <!-- Syllabus Sidebar modal panel -->
+    <div id="syllabus-panel" class="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out border-l border-slate-200 overflow-y-auto hidden">
+        <div class="p-6">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-university text-indigo-900"></i> Course Details (EL-112)
+                </h3>
+                <button class="text-slate-400 hover:text-slate-600" onclick="toggleSyllabusPanel()">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="mt-6 space-y-6 text-sm text-slate-600">
+                <div>
+                    <h4 class="font-bold text-indigo-900 mb-2">Subject Information</h4>
+                    <p><strong>Name:</strong> Applied Physics</p>
+                    <p><strong>Code:</strong> EL-112</p>
+                    <p><strong>Batch:</strong> 26EL (I, II & III)</p>
+                    <p><strong>Instructors:</strong> Dr. Shoaib Ahmed Khatri (Theory), Engr. Suhail Ahmed Shaikh (Practical)</p>
+                    <p><strong>Credit Hours:</strong> 3 (Theory) + 1 (Practical)</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-indigo-900 mb-2">Course Learning Outcomes (CLOs)</h4>
+                    <div class="space-y-2">
+                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                            <span class="font-bold text-indigo-700">CLO 1 (C1):</span> Define basic concepts of electrical quantities and laws (Cognitive, Linking to PLO-1).
+                        </div>
+                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                            <span class="font-bold text-indigo-700">CLO 2 (C2):</span> Express comprehensive knowledge of electrical & magnetic circuits, pn junction, semiconductors, nuclear physics (Cognitive, PLO-1).
+                        </div>
+                        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                            <span class="font-bold text-indigo-700">CLO 3 (P2):</span> Analyze behavioral dynamics of electromagnetism, capacitance, and resistance (Psychomotor, PLO-4).
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-indigo-900 mb-2">Practical Lab Outlines</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Safety Rules and Electric Shock hazards</li>
+                        <li>Use of Multimeter (Voltmeter and Ammeter)</li>
+                        <li>Verification of Ohm’s Law</li>
+                        <li>Color Coding of Resistors (Interactive inside this app!)</li>
+                        <li>Resistors in Series and Parallel configurations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN BODY -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        
+        <!-- Welcome MUET Alert Banner -->
+        <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-xl shadow-sm mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="p-2 bg-indigo-100 text-indigo-800 rounded-lg">
+                    <i class="fa-solid fa-graduation-cap text-lg animate-pulse"></i>
+                </span>
+                <div>
+                    <p class="text-sm font-semibold text-indigo-950">Applied Physics Interactive Simulator Corner</p>
+                    <p class="text-xs text-indigo-700">Designed to supplement lecture notes and lab experiments on Resistance and Ohm's Law. Approved under MUET academic plan 2026-27.</p>
+                </div>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-indigo-400 hover:text-indigo-600 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Master Tabs -->
+        <div class="flex overflow-x-auto border-b border-slate-200 mb-6 gap-2 pb-1 scrollbar-thin">
+            <button onclick="switchTab('micro')" id="tab-micro" class="tab-active py-3 px-5 text-sm font-bold border-b-2 border-transparent transition-all rounded-t-xl hover:bg-slate-100 whitespace-nowrap flex items-center gap-2">
+                <i class="fa-solid fa-atom"></i> Microscopic Resistor Lab
+            </button>
+            <button onclick="switchTab('ohms')" id="tab-ohms" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent transition-all rounded-t-xl hover:bg-slate-100 whitespace-nowrap flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> Ohm's Law Playground
+            </button>
+            <button onclick="switchTab('temp')" id="tab-temp" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent transition-all rounded-t-xl hover:bg-slate-100 whitespace-nowrap flex items-center gap-2">
+                <i class="fa-solid fa-temperature-half"></i> Temperature Chamber
+            </button>
+            <button onclick="switchTab('colors')" id="tab-colors" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent transition-all rounded-t-xl hover:bg-slate-100 whitespace-nowrap flex items-center gap-2">
+                <i class="fa-solid fa-palette"></i> Resistor Color Decoder
+            </button>
+            <button onclick="switchTab('sandbox')" id="tab-sandbox" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent transition-all rounded-t-xl hover:bg-slate-100 whitespace-nowrap flex items-center gap-2">
+                <i class="fa-solid fa-network-wired"></i> Series/Parallel Solver
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent transition-all rounded-t-xl hover:bg-slate-100 whitespace-nowrap flex items-center gap-2">
+                <i class="fa-solid fa-circle-question"></i> Exam Prep Quiz
+            </button>
+        </div>
+
+        <!-- Tab contents wrapper -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left & Center Primary Simulator Columns -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- TAB 1: Microscopic Resistor Lab -->
+                <div id="panel-micro" class="glass-panel p-6 rounded-2xl shadow-sm space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-slate-900">Atomic Resistance Simulator</h2>
+                            <p class="text-xs text-slate-500">Formulate specific resistance dynamics using $R = \rho \frac{l}{A}$ with an interactive microscopic electron drift view.</p>
+                        </div>
+                        <span class="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold py-1 px-3 rounded-full uppercase tracking-wider">Lab-05 Tool</span>
+                    </div>
+
+                    <!-- Canvas Resistor Simulation -->
+                    <div class="relative bg-slate-950 rounded-xl overflow-hidden shadow-inner border border-slate-800">
+                        <!-- Canvas Header values overlay -->
+                        <div class="absolute top-3 left-4 right-4 flex justify-between text-[11px] font-mono text-indigo-200 z-10 pointer-events-none">
+                            <div>Material: <span id="overlay-material" class="text-white font-bold">Copper</span></div>
+                            <div>Electron Drift velocity: <span id="overlay-speed" class="text-emerald-400 font-bold">---</span></div>
+                            <div>Temperature: <span id="overlay-temp" class="text-orange-400 font-bold">20°C</span></div>
+                        </div>
+                        <canvas id="wireCanvas" class="w-full h-56 block bg-slate-950"></canvas>
+                        <!-- Canvas Legend overlay -->
+                        <div class="absolute bottom-3 left-4 right-4 flex gap-4 text-[10px] text-slate-400 z-10 pointer-events-none">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow"></span> Lattice Cation (+)</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block shadow"></span> Free Electron (e-)</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block shadow"></span> Friction Collision</span>
+                        </div>
+                    </div>
+
+                    <!-- Microscopic Controls -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                                    <span>Material Presets (&rho; Specific Resistance)</span>
+                                    <span class="text-indigo-600 font-mono" id="val-rho">1.72 x 10^-8 Ω·m</span>
+                                </label>
+                                <select id="control-material" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="updateMicroscopicParams()">
+                                    <option value="silver">Silver (α: 0.0038, ρ: 1.64e-8)</option>
+                                    <option value="copper" selected>Copper (α: 0.00393, ρ: 1.72e-8)</option>
+                                    <option value="gold">Gold (α: 0.00365, ρ: 2.44e-8)</option>
+                                    <option value="aluminium">Aluminium (α: 0.00403, ρ: 2.82e-8)</option>
+                                    <option value="iron">Iron (α: 0.0065, ρ: 9.8e-8)</option>
+                                    <option value="manganin">Manganin (α: 0.000015, ρ: 4.4e-7)</option>
+                                    <option value="carbon">Carbon (α: -0.0005, ρ: 3.5e-5)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                                    <span>Conductor Length ($l$)</span>
+                                    <span class="text-indigo-600 font-bold" id="val-length">10.0 m</span>
+                                </label>
+                                <input type="range" id="control-length" min="1" max="100" step="0.5" value="10" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateMicroscopicParams()">
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                                    <span>Cross-Sectional Area ($A$)</span>
+                                    <span class="text-indigo-600 font-bold" id="val-area">2.5 mm²</span>
+                                </label>
+                                <input type="range" id="control-area" min="0.1" max="10" step="0.1" value="2.5" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateMicroscopicParams()">
+                            </div>
+
+                            <div>
+                                <label class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                                    <span>Applied Driving Voltage ($V$)</span>
+                                    <span class="text-indigo-600 font-bold" id="val-voltage">5.0 V</span>
+                                </label>
+                                <input type="range" id="control-voltage" min="0.5" max="30" step="0.5" value="5" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateMicroscopicParams()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Ohm's Law Playground -->
+                <div id="panel-ohms" class="glass-panel p-6 rounded-2xl shadow-sm space-y-6 hidden">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900">Ohm's Law Proportionality Arena</h2>
+                        <p class="text-xs text-slate-500">Experience how Voltage ($V$), Current ($I$), and Resistance ($R$) morph together. Note the dynamic text sizing representing intensity.</p>
+                    </div>
+
+                    <!-- Visual Equation Display -->
+                    <div class="bg-gradient-to-br from-indigo-900 to-indigo-950 rounded-2xl p-8 text-center text-white relative overflow-hidden shadow-inner flex flex-col items-center justify-center min-h-[220px]">
+                        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#e0e7ff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                        
+                        <div class="flex items-center justify-center gap-6 sm:gap-12 z-10 transition-all duration-300">
+                            <!-- Voltage element -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-xs font-mono uppercase tracking-wider text-indigo-300">Voltage</span>
+                                <div id="v-letter" class="font-extrabold text-blue-400 select-none cursor-default" style="font-size: 4rem;">V</div>
+                                <span class="text-sm font-semibold text-slate-300" id="v-val-label">5.0 V</span>
+                            </div>
+                            
+                            <!-- Equality sign -->
+                            <div class="text-4xl font-light text-indigo-400 select-none">=</div>
+
+                            <!-- Current element -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-xs font-mono uppercase tracking-wider text-emerald-300">Current</span>
+                                <div id="i-letter" class="font-extrabold text-emerald-400 select-none cursor-default" style="font-size: 3rem;">I</div>
+                                <span class="text-sm font-semibold text-slate-300" id="i-val-label">1.25 A</span>
+                            </div>
+
+                            <!-- Multiplier sign -->
+                            <div class="text-3xl font-light text-indigo-400 select-none">×</div>
+
+                            <!-- Resistance element -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-xs font-mono uppercase tracking-wider text-rose-300">Resistance</span>
+                                <div id="r-letter" class="font-extrabold text-rose-400 select-none cursor-default" style="font-size: 2rem;">R</div>
+                                <span class="text-sm font-semibold text-slate-300" id="r-val-label">4.0 Ω</span>
+                            </div>
+                        </div>
+
+                        <p class="mt-6 text-xs text-indigo-200 z-10 max-w-md">
+                            💡 <span class="font-bold">Interpretation:</span> To increase Current ($I$), you must either push with more Voltage ($V$), or relieve the squeeze of Resistance ($R$).
+                        </p>
+                    </div>
+
+                    <!-- Ohms Sliders -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-700 mb-2">
+                                    <span>Voltage ($V$)</span>
+                                    <span class="text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full font-mono text-xs">V = <span id="ohms-v-val">12</span> V</span>
+                                </label>
+                                <input type="range" id="slider-ohms-v" min="1.0" max="100.0" step="0.5" value="12" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="solveOhmsLaw()">
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-700 mb-2">
+                                    <span>Resistance ($R$)</span>
+                                    <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full font-mono text-xs">R = <span id="ohms-r-val">6</span> Ω</span>
+                                </label>
+                                <input type="range" id="slider-ohms-r" min="0.5" max="100.0" step="0.5" value="6" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-600" oninput="solveOhmsLaw()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Temperature Chamber -->
+                <div id="panel-temp" class="glass-panel p-6 rounded-2xl shadow-sm space-y-6 hidden">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900">Thermal Resistance Chamber</h2>
+                        <p class="text-xs text-slate-500">Examine how temperature fluctuations change resistivity according to $R_t = R_0[1 + \alpha_0 (t_2 - t_1)]$. See PTC and NTC transitions.</p>
+                    </div>
+
+                    <!-- Real-time Plot Card -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative h-72">
+                        <canvas id="tempChart" class="w-full h-full"></canvas>
+                    </div>
+
+                    <!-- Controls & Parameters -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                                    <span>Preset Material Selection</span>
+                                    <span class="text-indigo-600 font-mono text-xs" id="val-t-alpha">α = 0.00393/°C</span>
+                                </label>
+                                <select id="temp-material" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="updateTempParams()">
+                                    <option value="copper" selected>Copper (PTC - standard α: 0.00393)</option>
+                                    <option value="silver">Silver (PTC - highly conductive α: 0.0038)</option>
+                                    <option value="aluminium">Aluminium (PTC - lightweight α: 0.00403)</option>
+                                    <option value="iron">Iron (PTC - high temperature rise α: 0.0065)</option>
+                                    <option value="manganin">Manganin (Near-Zero α: 0.000015)</option>
+                                    <option value="carbon">Carbon (NTC - semiconductor-like α: -0.0005)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                                    <span>Reference Resistance at 0°C ($R_0$)</span>
+                                    <span class="text-indigo-600 font-bold" id="val-temp-r0">10.0 Ω</span>
+                                </label>
+                                <input type="range" id="temp-r0" min="1" max="100" step="1" value="10" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateTempParams()">
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                                    <span>Chamber Temperature ($T$)</span>
+                                    <span class="text-orange-600 font-bold" id="val-temp-t">20 °C</span>
+                                </label>
+                                <input type="range" id="temp-t" min="-200" max="300" step="2" value="20" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-600" oninput="updateTempParams()">
+                            </div>
+
+                            <div class="flex items-center justify-between p-3.5 bg-indigo-50/50 rounded-xl border border-indigo-100 shadow-inner">
+                                <span class="text-xs font-bold text-indigo-900">Current Resistance $R_T$:</span>
+                                <span class="text-lg font-black text-indigo-600" id="temp-final-res">10.79 Ω</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: Color Code Decoder -->
+                <div id="panel-colors" class="glass-panel p-6 rounded-2xl shadow-sm space-y-6 hidden">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-slate-900">Resistor Color Code Lab (Lab-05)</h2>
+                            <p class="text-xs text-slate-500">Select bands dynamically to compute total resistance, multiplier value, and manufacturing tolerances.</p>
+                        </div>
+                        <div class="flex gap-2 bg-slate-100 p-1 rounded-lg">
+                            <button id="band-4-btn" class="text-xs font-bold py-1 px-3 bg-white text-indigo-700 shadow-sm rounded-md border border-slate-200 transition-all" onclick="changeBandCount(4)">4 Bands</button>
+                            <button id="band-5-btn" class="text-xs font-bold py-1 px-3 text-slate-500 hover:text-slate-700 transition-all" onclick="changeBandCount(5)">5 Bands</button>
+                        </div>
+                    </div>
+
+                    <!-- Resistor SVG Rendering -->
+                    <div class="bg-gradient-to-b from-slate-100 to-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center relative shadow-inner overflow-x-auto min-h-[160px]">
+                        <!-- Resistor Chassis visual using SVG -->
+                        <div class="relative w-[340px] h-[72px] flex items-center">
+                            <!-- Left Wire lead -->
+                            <div class="absolute left-0 right-0 h-1.5 bg-slate-400 rounded"></div>
+                            <!-- Resistor Body -->
+                            <div class="absolute left-[40px] right-[40px] top-0 bottom-0 bg-[#ffd9a3] rounded-3xl border-[3px] border-amber-200/50 flex justify-between px-6 items-center shadow-md">
+                                <div id="res-band-1" class="w-3.5 h-full bg-amber-600 transition-all shadow-sm"></div>
+                                <div id="res-band-2" class="w-3.5 h-full bg-slate-800 transition-all shadow-sm"></div>
+                                <div id="res-band-3" class="w-3.5 h-full bg-rose-500 transition-all shadow-sm hidden"></div>
+                                <div id="res-band-4" class="w-3.5 h-full bg-red-500 transition-all shadow-sm"></div>
+                                <div id="res-band-5" class="w-3.5 h-full bg-amber-500 transition-all shadow-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bands selections -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3" id="band-selectors-container">
+                        <!-- Dynamic Band drop-downs will inject here based on 4-band/5-band selection -->
+                    </div>
+
+                    <!-- Display results -->
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2.5 bg-emerald-100 text-emerald-800 rounded-lg">
+                                <i class="fa-solid fa-calculator text-lg"></i>
+                            </span>
+                            <div>
+                                <p class="text-xs font-semibold text-emerald-950">Decoded Resistance Output</p>
+                                <p class="text-xs text-emerald-700">Calculated according to standard EIA code parameters.</p>
+                            </div>
+                        </div>
+                        <div class="text-center sm:text-right">
+                            <span class="text-2xl font-black text-emerald-800" id="decoded-res-val">2.2 kΩ</span>
+                            <span class="text-sm font-semibold text-emerald-600 ml-1" id="decoded-tol-val">±5%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: Series/Parallel Solver -->
+                <div id="panel-sandbox" class="glass-panel p-6 rounded-2xl shadow-sm space-y-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-slate-900">Series and Parallel Lab</h2>
+                            <p class="text-xs text-slate-500">Design complex combinations of networks to verify Ohm's and Kirchhoff's Laws dynamically.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-1.5 px-3.5 rounded-lg shadow-sm transition" onclick="circuitAddResistor()">
+                                <i class="fa-solid fa-plus mr-1"></i> Add Resistor
+                            </button>
+                            <button class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold py-1.5 px-3.5 rounded-lg shadow-sm transition" onclick="circuitReset()">
+                                <i class="fa-solid fa-rotate mr-1"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Circuit topology selection -->
+                    <div class="flex items-center gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-sm">
+                        <span class="font-bold text-slate-700">Network Type:</span>
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="circuit-type" value="series" checked class="text-indigo-600 focus:ring-indigo-500" onchange="circuitRecalculate()"> Series Combination
+                        </label>
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="circuit-type" value="parallel" class="text-indigo-600 focus:ring-indigo-500" onchange="circuitRecalculate()"> Parallel Combination
+                        </label>
+                    </div>
+
+                    <!-- Resistors Grid List -->
+                    <div id="circuit-resistors-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Dynamic list of Resistors to configure -->
+                    </div>
+
+                    <!-- Supply voltage configuration -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-100 p-4 rounded-xl border border-slate-200 text-xs">
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-1">Applied Source Voltage ($V_{total}$):</label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="circuit-voltage-slider" min="1" max="100" step="1" value="12" class="w-full h-1.5 bg-slate-200 rounded-lg accent-indigo-600" oninput="circuitRecalculate()">
+                                <span class="font-mono font-bold text-sm text-indigo-700 bg-white border border-slate-200 py-1 px-3.5 rounded-lg shadow-sm min-w-[70px] text-center" id="circuit-voltage-val">12V</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end">
+                            <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-lg text-indigo-950 font-bold flex gap-4 w-full justify-between">
+                                <div>$R_{eq}$ Total: <span class="text-indigo-600" id="eq-res-val">12.0 Ω</span></div>
+                                <div>$I_{total}$ Current: <span class="text-indigo-600" id="total-current-val">1.00 A</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: Exam Prep Quiz -->
+                <div id="panel-quiz" class="glass-panel p-6 rounded-2xl shadow-sm space-y-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-slate-900">MUET Exam Practice Corner</h2>
+                            <p class="text-xs text-slate-500">Solve real evaluation problems extracted from standard examinations at MUET, Jamshoro.</p>
+                        </div>
+                        <div class="bg-slate-100 px-3 py-1 rounded-full text-xs font-bold text-slate-700">
+                            Score: <span id="quiz-score-correct" class="text-indigo-600">0</span>/<span id="quiz-total-attempted">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Question Box -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded-md" id="quiz-q-num">Q. 1/10</span>
+                            <span class="text-slate-400 text-xs font-semibold" id="quiz-q-topic">Ohm's Law Concepts</span>
+                        </div>
+                        <p class="font-bold text-slate-900" id="quiz-q-text">Which of the following describes the microscopic physical explanation of resistance inside a metallic conductor?</p>
+                        
+                        <!-- Options list -->
+                        <div class="space-y-2" id="quiz-options-box">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Feedback / Explanation card -->
+                        <div id="quiz-feedback-box" class="hidden p-4 rounded-lg text-xs leading-relaxed transition-all"></div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold py-2 px-4 rounded-lg transition" onclick="resetQuiz()">
+                            <i class="fa-solid fa-redo mr-1"></i> Restart Quiz
+                        </button>
+                        <button class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-5 rounded-lg shadow-md transition" id="quiz-next-btn" onclick="nextQuizQuestion()">
+                            Next Question <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right-Hand Side Context Column -->
+            <div class="space-y-6">
+
+                <!-- Academic Progress Check -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <h3 class="text-md font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-indigo-900"></i> EL-112 Lab Milestones
+                    </h3>
+                    <div class="space-y-3 text-xs text-slate-600">
+                        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <input type="checkbox" checked disabled class="h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500">
+                            <div>
+                                <p class="font-bold text-slate-900">Standard Symbols & Units</p>
+                                <p class="text-slate-400">Identify Ohm, Siemens, specific resistance.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <input type="checkbox" id="check-color" class="h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500" disabled>
+                            <div>
+                                <p class="font-bold text-slate-900">Resistor Color Code</p>
+                                <p class="text-slate-400">Complete decoding of 4 & 5 bands.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <input type="checkbox" id="check-ohms" class="h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500" disabled>
+                            <div>
+                                <p class="font-bold text-slate-900">Ohm's Law Verification</p>
+                                <p class="text-slate-400">Solve $V/I=R$ proportionality.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <input type="checkbox" id="check-temp" class="h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500" disabled>
+                            <div>
+                                <p class="font-bold text-slate-900">Temperature Coefficient</p>
+                                <p class="text-slate-400">PTC/NTC transitions on metals vs carbon.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulations Reference Sheet -->
+                <div class="bg-gradient-to-br from-indigo-950 to-slate-950 text-white rounded-2xl p-6 shadow-xl space-y-4 relative overflow-hidden">
+                    <div class="absolute -right-16 -bottom-16 w-44 h-44 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                    <h3 class="text-md font-extrabold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-square-root-variable text-indigo-400"></i> Physics Reference Panel
+                    </h3>
+                    
+                    <div class="space-y-4 text-xs font-medium text-indigo-200">
+                        <!-- Spec resistance -->
+                        <div class="border-b border-indigo-900 pb-3 space-y-1">
+                            <span class="font-mono text-emerald-400 font-bold block">Resistivity Equation:</span>
+                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$R = \rho \frac{l}{A}$</div>
+                            <p class="text-[10px] leading-relaxed">Where $R$ is Resistance ($\Omega$), $\rho$ is Specific Resistance ($\Omega\cdot\text{m}$), $l$ is conductor length ($\text{m}$), and $A$ is cross-sectional Area ($\text{m}^2$).</p>
+                        </div>
+
+                        <!-- Tempt coeff -->
+                        <div class="border-b border-indigo-900 pb-3 space-y-1">
+                            <span class="font-mono text-emerald-400 font-bold block">Temperature Variation:</span>
+                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$R_t = R_0 (1 + \alpha_0 t)$</div>
+                            <p class="text-[10px] leading-relaxed">Where $\alpha_0$ is temperature coefficient ($/^{\circ}\text{C}$) at reference point $0^{\circ}\text{C}$. For standard Copper, $\alpha_0 = 1/234.5 \approx 0.00427/^{\circ}\text{C}$.</p>
+                        </div>
+
+                        <!-- Drift speed -->
+                        <div class="space-y-1">
+                            <span class="font-mono text-emerald-400 font-bold block">Electron Drift Velocity:</span>
+                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$v_d = \frac{I}{n \cdot e \cdot A}$</div>
+                            <p class="text-[10px] leading-relaxed">Where $n$ is carrier concentration, $e$ is electronic charge ($1.6 \times 10^{-19}\,\text{C}$), and $v_d$ is the very slow axial drift speed of free carriers.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Stamp -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center space-y-3">
+                    <p class="text-slate-400 font-bold tracking-widest text-[10px] uppercase">Official Course Companion</p>
+                    <div class="flex justify-center text-slate-300">
+                        <i class="fa-solid fa-stamp text-4xl"></i>
+                    </div>
+                    <div class="text-xs text-slate-500">
+                        <p class="font-bold text-slate-800">First Semester Engineering Curricula</p>
+                        <p>MUET, Jamshoro, Sindh, Pakistan</p>
+                        <p class="text-[10px] font-mono mt-1 text-slate-400">FRM-001-QSP-004DEC.01, 2001</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 text-xs py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
+            <p>© 2026 Mehran University of Engineering and Technology, Jamshoro. Department of Electrical Engineering.</p>
+            <p class="text-[11px] text-slate-500">Prepared as an advanced digital workbook for Applied Physics (Theory/Practical) EL-112. Built by Departmental Web-Engine Group.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Tab system state
+        let activeTab = 'micro';
+
+        // TAB SWITCHER
+        function switchTab(tabId) {
+            // Hide all panels
+            document.getElementById('panel-micro').classList.add('hidden');
+            document.getElementById('panel-ohms').classList.add('hidden');
+            document.getElementById('panel-temp').classList.add('hidden');
+            document.getElementById('panel-colors').classList.add('hidden');
+            document.getElementById('panel-sandbox').classList.add('hidden');
+            document.getElementById('panel-quiz').classList.add('hidden');
+
+            // Deactivate all tab borders
+            document.getElementById('tab-micro').classList.remove('tab-active');
+            document.getElementById('tab-ohms').classList.remove('tab-active');
+            document.getElementById('tab-temp').classList.remove('tab-active');
+            document.getElementById('tab-colors').classList.remove('tab-active');
+            document.getElementById('tab-sandbox').classList.remove('tab-active');
+            document.getElementById('tab-quiz').classList.remove('tab-active');
+
+            // Show selected panel
+            document.getElementById('panel-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('tab-active');
+
+            activeTab = tabId;
+
+            // Specific initializations
+            if (tabId === 'temp') {
+                setTimeout(initTempChart, 100);
+            }
+            if (tabId === 'colors') {
+                renderResistorDecoderOptions();
+            }
+        }
+
+        // Syllabus Panel Toggle
+        function toggleSyllabusPanel() {
+            const panel = document.getElementById('syllabus-panel');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 50);
+            } else {
+                panel.classList.add('translate-x-full');
+                setTimeout(() => panel.classList.add('hidden'), 300);
+            }
+        }
+
+        // Custom non-blocking Notification Toast system
+        function showNotification(title, message, type = 'indigo') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl shadow-lg border bg-white border-slate-200 pointer-events-auto transition-all duration-300 transform translate-x-12 opacity-0 max-w-sm flex gap-3`;
+            
+            let iconClass = 'fa-info-circle text-indigo-600';
+            if (type === 'success') iconClass = 'fa-check-circle text-emerald-600';
+            if (type === 'error') iconClass = 'fa-exclamation-circle text-rose-600';
+
+            toast.innerHTML = `
+                <div class="mt-0.5"><i class="fa-solid ${iconClass} text-lg"></i></div>
+                <div>
+                    <h5 class="text-xs font-bold text-slate-900">${title}</h5>
+                    <p class="text-xs text-slate-500 mt-0.5">${message}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            
+            // Animate In
+            setTimeout(() => {
+                toast.classList.remove('translate-x-12', 'opacity-0');
+            }, 50);
+
+            // Animate Out after 3.5s
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // CANVAS ELECTRON DRIFT SIMULATOR
+        const canvas = document.getElementById('wireCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let animationFrameId;
+        let atoms = [];
+        let electrons = [];
+        let collisions = [];
+
+        // Physical settings
+        let specResistivity = 1.72e-8; // Copper default
+        let lengthParam = 10; // meters
+        let areaParam = 2.5; // mm2
+        let voltageParam = 5; // Volts
+        let currentParam = 0;
+        let resistanceParam = 0;
+        let materialName = "Copper";
+        let thermalAlpha = 0.00393;
+        let referenceTemp = 20; // °C
+
+        function initWireCanvas() {
+            // High DPI Canvas Scaling
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            // Generate atomic lattice structure based on Area
+            atoms = [];
+            const rows = Math.min(6, Math.max(2, Math.floor(areaParam * 0.8)));
+            const cols = 15;
+            const rowSpac = canvas.height / (rows + 1);
+            const colSpac = canvas.width / (cols + 1);
+
+            for (let r = 1; r <= rows; r++) {
+                for (let c = 1; c <= cols; c++) {
+                    atoms.push({
+                        x: c * colSpac,
+                        y: r * rowSpac,
+                        origX: c * colSpac,
+                        origY: r * rowSpac,
+                        vibratePhase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            // Generate free electron carriers
+            electrons = [];
+            const carrierCount = Math.floor(Math.max(20, areaParam * 10));
+            for (let i = 0; i < carrierCount; i++) {
+                electrons.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: 0,
+                    vy: (Math.random() - 0.5) * 1.5,
+                    size: 2.5
+                });
+            }
+
+            collisions = [];
+        }
+
+        // Resize Canvas dynamically on viewport shifts
+        window.addEventListener('resize', () => {
+            if (activeTab === 'micro') {
+                initWireCanvas();
+            }
+        });
+
+        // Loop animation
+        function animateWire() {
+            if (activeTab !== 'micro') {
+                animationFrameId = requestAnimationFrame(animateWire);
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Shaking amplitude representing thermal lattice vibrations
+            // At high temperatures, cations shake more aggressively
+            const tempDiffFactor = (referenceTemp + 273.15) / 293.15; // relative to room temp 20°C (293K)
+            const vibrateAmp = Math.max(0.5, tempDiffFactor * 2.8);
+
+            // Render Atomic Lattice Cations
+            atoms.forEach(atom => {
+                atom.vibratePhase += 0.25;
+                const offset = Math.sin(atom.vibratePhase) * vibrateAmp;
+                atom.x = atom.origX + offset;
+                atom.y = atom.origY + offset;
+
+                // Glowing heat ring based on current temperature
+                ctx.beginPath();
+                ctx.arc(atom.x, atom.y, 8 + vibrateAmp * 0.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(239, 68, 68, ${0.15 + (vibrateAmp * 0.05)})`;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(atom.x, atom.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#f43f5e';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // Calculate drift speed based on Voltage / Resistance
+            // Drift velocity is actually quite slow (e.g. 10^-4 m/s) but scaled for visual representation
+            const visualDriftForce = (voltageParam / resistanceParam) * 0.85;
+
+            // Update & Render Free Electrons
+            electrons.forEach(el => {
+                // Apply driving voltage force pushing left to right
+                el.vx = visualDriftForce + (Math.random() * 0.4);
+                el.x += el.vx;
+                el.y += el.vy;
+
+                // Wall boundary loops
+                if (el.x > canvas.width) {
+                    el.x = 0;
+                    el.y = Math.random() * canvas.height;
+                }
+                if (el.y < 0 || el.y > canvas.height) {
+                    el.vy = -el.vy;
+                }
+
+                // Check collisions with standard atoms
+                atoms.forEach(atom => {
+                    const dist = Math.hypot(el.x - atom.x, el.y - atom.y);
+                    if (dist < 8) {
+                        // Collision occurred!
+                        el.vy = (Math.random() - 0.5) * 4; // randomize crosswise speed
+                        
+                        // Push electron away
+                        el.x += 3; 
+
+                        // Trigger visual splash representing energy dissipation (heating)
+                        if (collisions.length < 15) {
+                            collisions.push({
+                                x: atom.x,
+                                y: atom.y,
+                                radius: 4,
+                                alpha: 1.0
+                            });
+                        }
+                    }
+                });
+
+                // Render Electron
+                ctx.beginPath();
+                ctx.arc(el.x, el.y, el.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#38bdf8';
+                ctx.shadowColor = '#0284c7';
+                ctx.shadowBlur = 4;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            });
+
+            // Render Collision Splashes
+            for (let i = collisions.length - 1; i >= 0; i--) {
+                const col = collisions[i];
+                col.radius += 1.2;
+                col.alpha -= 0.08;
+
+                if (col.alpha <= 0) {
+                    collisions.splice(i, 1);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(col.x, col.y, col.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(245, 158, 11, ${col.alpha})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(animateWire);
+        }
+
+        // Initialize parameter controls
+        function updateMicroscopicParams() {
+            const materialSelect = document.getElementById('control-material');
+            const lengthSlider = document.getElementById('control-length');
+            const areaSlider = document.getElementById('control-area');
+            const voltSlider = document.getElementById('control-voltage');
+
+            lengthParam = parseFloat(lengthSlider.value);
+            areaParam = parseFloat(areaSlider.value);
+            voltageParam = parseFloat(voltSlider.value);
+
+            // Preset lookup tables
+            const presets = {
+                silver: { rho: 1.64e-8, name: "Silver", alpha: 0.0038 },
+                copper: { rho: 1.72e-8, name: "Copper", alpha: 0.00393 },
+                gold: { rho: 2.44e-8, name: "Gold", alpha: 0.00365 },
+                aluminium: { rho: 2.82e-8, name: "Aluminium", alpha: 0.00403 },
+                iron: { rho: 9.8e-8, name: "Iron", alpha: 0.0065 },
+                manganin: { rho: 4.4e-7, name: "Manganin", alpha: 0.000015 },
+                carbon: { rho: 3.5e-5, name: "Carbon", alpha: -0.0005 }
+            };
+
+            const selected = presets[materialSelect.value];
+            specResistivity = selected.rho;
+            materialName = selected.name;
+            thermalAlpha = selected.alpha;
+
+            // Calculate resistance based on R = rho * L / A
+            // Area converted from mm2 to m2: Area * 10^-6
+            const actualArea = areaParam * 1e-6;
+            resistanceParam = specResistivity * (lengthParam / actualArea);
+            currentParam = voltageParam / resistanceParam;
+
+            // Formulate human readable outputs
+            document.getElementById('val-rho').innerText = `${specResistivity.toExponential(2)} Ω·m`;
+            document.getElementById('val-length').innerText = `${lengthParam.toFixed(1)} m`;
+            document.getElementById('val-area').innerText = `${areaParam.toFixed(1)} mm²`;
+            document.getElementById('val-voltage').innerText = `${voltageParam.toFixed(1)} V`;
+
+            // Canvas HUD text updates
+            document.getElementById('overlay-material').innerText = materialName;
+            document.getElementById('overlay-speed').innerText = currentParam > 1000 ? `${(currentParam/1000).toFixed(1)} kA/m²` : `${currentParam.toFixed(2)} A/m²`;
+
+            // Check progress trigger
+            document.getElementById('check-ohms').checked = true;
+
+            // Reinitialize lattice structures if Area threshold is changed significantly
+            if (atoms.length !== Math.min(6, Math.max(2, Math.floor(areaParam * 0.8))) * 15) {
+                initWireCanvas();
+            }
+        }
+
+        // TAB 2: Ohm's Law calculator
+        function solveOhmsLaw() {
+            const vSlider = document.getElementById('slider-ohms-v');
+            const rSlider = document.getElementById('slider-ohms-r');
+
+            const voltage = parseFloat(vSlider.value);
+            const resistance = parseFloat(rSlider.value);
+            const current = voltage / resistance;
+
+            document.getElementById('ohms-v-val').innerText = voltage.toFixed(1);
+            document.getElementById('ohms-r-val').innerText = resistance.toFixed(1);
+
+            document.getElementById('v-val-label').innerText = `${voltage.toFixed(1)} V`;
+            document.getElementById('r-val-label').innerText = `${resistance.toFixed(1)} Ω`;
+            document.getElementById('i-val-label').innerText = current > 100 ? `${(current/1000).toFixed(2)} kA` : `${current.toFixed(2)} A`;
+
+            // Dynamic Font Sizing to visualize values in the equation panel
+            // Boundaries are carefully clamped between 2rem and 6rem
+            const sizeV = Math.min(6, Math.max(2, 2 + (voltage / 25)));
+            const sizeR = Math.min(6, Math.max(2, 2 + (resistance / 25)));
+            const sizeI = Math.min(6, Math.max(2, 2 + (current / 5)));
+
+            document.getElementById('v-letter').style.fontSize = `${sizeV}rem`;
+            document.getElementById('r-letter').style.fontSize = `${sizeR}rem`;
+            document.getElementById('i-letter').style.fontSize = `${sizeI}rem`;
+        }
+
+        // TAB 3: Thermal Chamber Charting logic
+        let tempChartInstance = null;
+
+        function initTempChart() {
+            const canvasElement = document.getElementById('tempChart');
+            if (!canvasElement) return;
+
+            // Reconstruct if chart already exists to avoid canvas overlap conflicts
+            if (tempChartInstance) {
+                tempChartInstance.destroy();
+            }
+
+            const ctxChart = canvasElement.getContext('2d');
+            
+            // Build visual range data (-200°C to 300°C)
+            const temperatures = [];
+            const resistances = [];
+            
+            const presetR0 = parseFloat(document.getElementById('temp-r0').value);
+            const selectedAlpha = getSelectedAlpha();
+
+            for (let t = -200; t <= 300; t += 25) {
+                temperatures.push(t);
+                // R = R0 * (1 + alpha * T)
+                let calculatedR = presetR0 * (1 + selectedAlpha * t);
+                if (calculatedR < 0) calculatedR = 0; // Absolute physical zero limit clamp
+                resistances.push(calculatedR);
+            }
+
+            // High aesthetic configuration for chart datasets
+            tempChartInstance = new Chart(ctxChart, {
+                type: 'line',
+                data: {
+                    labels: temperatures,
+                    datasets: [{
+                        label: 'Resistance (Ω) vs Temperature (°C)',
+                        data: resistances,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.05)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        fill: true,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#4f46e5',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)',
+                                font: { size: 11, weight: 'bold' }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Resistance (Ω)',
+                                font: { size: 11, weight: 'bold' }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getSelectedAlpha() {
+            const material = document.getElementById('temp-material').value;
+            const alphas = {
+                silver: 0.0038,
+                copper: 0.00393,
+                aluminium: 0.00403,
+                iron: 0.0065,
+                manganin: 0.000015,
+                carbon: -0.0005
+            };
+            return alphas[material];
+        }
+
+        function updateTempParams() {
+            const matSelect = document.getElementById('temp-material');
+            const r0Slider = document.getElementById('temp-r0');
+            const tempSlider = document.getElementById('temp-temp'); // note we updated element id slightly in HTML inside range.
+            const tSlider = document.getElementById('temp-t');
+
+            const r0 = parseFloat(r0Slider.value);
+            const temp = parseFloat(tSlider.value);
+            const alpha = getSelectedAlpha();
+
+            // Calculate current temperature modified resistance
+            let finalR = r0 * (1 + alpha * temp);
+            if (finalR < 0) finalR = 0; // physics safeguard
+
+            // Render updates
+            document.getElementById('val-t-alpha').innerText = `α = ${alpha.toExponential(2)}/°C`;
+            document.getElementById('val-temp-r0').innerText = `${r0.toFixed(1)} Ω`;
+            document.getElementById('val-temp-t').innerText = `${temp.toFixed(0)} °C`;
+            document.getElementById('temp-final-res').innerText = `${finalR.toFixed(2)} Ω`;
+
+            // Push temp update inside canvas visualizer if they share reference
+            referenceTemp = temp;
+            document.getElementById('overlay-temp').innerText = `${temp.toFixed(0)}°C`;
+
+            // Replot curves
+            if (tempChartInstance) {
+                const newData = [];
+                for (let t = -200; t <= 300; t += 25) {
+                    let calculatedR = r0 * (1 + alpha * t);
+                    if (calculatedR < 0) calculatedR = 0;
+                    newData.push(calculatedR);
+                }
+                tempChartInstance.data.datasets[0].data = newData;
+                tempChartInstance.update('none'); // silent updates
+            }
+
+            document.getElementById('check-temp').checked = true;
+        }
+
+        // TAB 4: Resistor color decoder implementation
+        let currentBandCount = 4;
+        const colorPalette = {
+            black: { val: 0, mult: 1, tol: null, hex: '#000000', text: '#ffffff' },
+            brown: { val: 1, mult: 10, tol: 1, hex: '#8b4513', text: '#ffffff' },
+            red: { val: 2, mult: 100, tol: 2, hex: '#ff0000', text: '#ffffff' },
+            orange: { val: 3, mult: 1000, tol: 0.05, hex: '#ffa500', text: '#000000' },
+            yellow: { val: 4, mult: 10000, tol: 0.02, hex: '#ffff00', text: '#000000' },
+            green: { val: 5, mult: 100000, tol: 0.5, hex: '#008000', text: '#ffffff' },
+            blue: { val: 6, mult: 1000000, tol: 0.25, hex: '#0000ff', text: '#ffffff' },
+            violet: { val: 7, mult: 10000000, tol: 0.1, hex: '#ee82ee', text: '#000000' },
+            grey: { val: 8, mult: 100000000, tol: 0.05, hex: '#808080', text: '#ffffff' },
+            white: { val: 9, mult: 1000000000, tol: null, hex: '#ffffff', text: '#000000' },
+            gold: { val: null, mult: 0.1, tol: 5, hex: '#ffd700', text: '#000000' },
+            silver: { val: null, mult: 0.01, tol: 10, hex: '#c0c0c0', text: '#000000' }
+        };
+
+        // Band state
+        let currentBandsState = {
+            band1: 'red',
+            band2: 'red',
+            band3: 'black', // only used in 5-band configuration
+            band4: 'red', // multiplier
+            band5: 'gold' // tolerance
+        };
+
+        function changeBandCount(count) {
+            currentBandCount = count;
+            
+            const btn4 = document.getElementById('band-4-btn');
+            const btn5 = document.getElementById('band-5-btn');
+            const res3 = document.getElementById('res-band-3');
+
+            if (count === 4) {
+                btn4.className = "text-xs font-bold py-1 px-3 bg-white text-indigo-700 shadow-sm rounded-md border border-slate-200 transition-all";
+                btn5.className = "text-xs font-bold py-1 px-3 text-slate-500 hover:text-slate-700 transition-all";
+                res3.classList.add('hidden');
+            } else {
+                btn5.className = "text-xs font-bold py-1 px-3 bg-white text-indigo-700 shadow-sm rounded-md border border-slate-200 transition-all";
+                btn4.className = "text-xs font-bold py-1 px-3 text-slate-500 hover:text-slate-700 transition-all";
+                res3.classList.remove('hidden');
+            }
+
+            renderResistorDecoderOptions();
+            decodeBands();
+        }
+
+        function renderResistorDecoderOptions() {
+            const container = document.getElementById('band-selectors-container');
+            container.innerHTML = '';
+
+            const configs = [
+                { id: 'band1', title: '1st Band (Digit)', type: 'digit' },
+                { id: 'band2', title: '2nd Band (Digit)', type: 'digit' }
+            ];
+
+            if (currentBandCount === 5) {
+                configs.push({ id: 'band3', title: '3rd Band (Digit)', type: 'digit' });
+            }
+
+            configs.push({ id: 'band4', title: 'Multiplier Band', type: 'mult' });
+            configs.push({ id: 'band5', title: 'Tolerance Band', type: 'tol' });
+
+            configs.forEach(conf => {
+                const selectDiv = document.createElement('div');
+                selectDiv.className = "space-y-1";
+                selectDiv.innerHTML = `
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">${conf.title}</label>
+                    <select id="select-${conf.id}" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="onBandColorChange('${conf.id}')">
+                        ${renderOptionsForType(conf.type, currentBandsState[conf.id])}
+                    </select>
+                `;
+                container.appendChild(selectDiv);
+            });
+
+            // Synchronize colors of standard display
+            syncVisualResistorColors();
+        }
+
+        function renderOptionsForType(type, selected) {
+            let optionsStr = '';
+            for (const [name, props] of Object.entries(colorPalette)) {
+                if (type === 'digit' && props.val === null) continue;
+                if (type === 'tol' && props.tol === null) continue;
+
+                const selectedAttr = (name === selected) ? 'selected' : '';
+                optionsStr += `<option value="${name}" ${selectedAttr}>${name.toUpperCase()}</option>`;
+            }
+            return optionsStr;
+        }
+
+        function onBandColorChange(bandId) {
+            const select = document.getElementById(`select-${bandId}`);
+            currentBandsState[bandId] = select.value;
+            syncVisualResistorColors();
+            decodeBands();
+        }
+
+        function syncVisualResistorColors() {
+            for (const [bandId, colorName] of Object.entries(currentBandsState)) {
+                const element = document.getElementById(`res-${bandId}`);
+                if (element) {
+                    element.style.backgroundColor = colorPalette[colorName].hex;
+                }
+            }
+        }
+
+        function decodeBands() {
+            const b1 = currentBandsState.band1;
+            const b2 = currentBandsState.band2;
+            const b3 = currentBandsState.band3;
+            const b4 = currentBandsState.band4; // multiplier
+            const b5 = currentBandsState.band5; // tolerance
+
+            let digitStr = `${colorPalette[b1].val}${colorPalette[b2].val}`;
+            if (currentBandCount === 5) {
+                digitStr += `${colorPalette[b3].val}`;
+            }
+
+            const baseVal = parseInt(digitStr);
+            const multiplier = colorPalette[b4].mult;
+            const finalResistance = baseVal * multiplier;
+            const tolerance = colorPalette[b5].tol;
+
+            // Render human readable value (kilo/mega scales)
+            let displayStr = '';
+            if (finalResistance >= 1000000) {
+                displayStr = `${(finalResistance / 1000000).toFixed(2).replace(/\.00$/, '')} MΩ`;
+            } else if (finalResistance >= 1000) {
+                displayStr = `${(finalResistance / 1000).toFixed(2).replace(/\.00$/, '')} kΩ`;
+            } else {
+                displayStr = `${finalResistance.toFixed(1).replace(/\.0$/, '')} Ω`;
+            }
+
+            document.getElementById('decoded-res-val').innerText = displayStr;
+            document.getElementById('decoded-tol-val').innerText = `±${tolerance}%`;
+
+            document.getElementById('check-color').checked = true;
+        }
+
+        // TAB 5: Circuit Sandbox simulator
+        let sandboxResistors = [
+            { id: 1, label: 'R1', value: 10 },
+            { id: 2, label: 'R2', value: 20 },
+            { id: 3, label: 'R3', value: 30 }
+        ];
+
+        function renderCircuitSandbox() {
+            const container = document.getElementById('circuit-resistors-container');
+            container.innerHTML = '';
+
+            sandboxResistors.forEach(res => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3 relative hover:border-indigo-300 transition";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-square-poll-vertical text-slate-400"></i> ${res.label}
+                        </span>
+                        <button class="text-slate-300 hover:text-rose-600 transition" onclick="circuitRemoveResistor(${res.id})">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                            <span>Resistance value:</span>
+                            <span class="font-mono font-bold text-indigo-600">${res.value} Ω</span>
+                        </div>
+                        <input type="range" min="1" max="100" step="1" value="${res.value}" class="w-full h-1 bg-slate-200 rounded-lg appearance-none accent-indigo-600" oninput="circuitModifyValue(${res.id}, this.value)">
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function circuitAddResistor() {
+            if (sandboxResistors.length >= 6) {
+                showNotification("Limit reached", "For visual clarity, maximum 6 series/parallel resistors can be solved together.", "error");
+                return;
+            }
+            const nextId = sandboxResistors.length > 0 ? Math.max(...sandboxResistors.map(r => r.id)) + 1 : 1;
+            sandboxResistors.push({
+                id: nextId,
+                label: `R${nextId}`,
+                value: 10
+            });
+            renderCircuitSandbox();
+            circuitRecalculate();
+        }
+
+        function circuitRemoveResistor(id) {
+            sandboxResistors = sandboxResistors.filter(r => r.id !== id);
+            renderCircuitSandbox();
+            circuitRecalculate();
+        }
+
+        function circuitModifyValue(id, value) {
+            const res = sandboxResistors.find(r => r.id === id);
+            if (res) {
+                res.value = parseInt(value);
+            }
+            // Silent layout label update to prevent laggy sliding
+            circuitRecalculate(true);
+        }
+
+        function circuitReset() {
+            sandboxResistors = [
+                { id: 1, label: 'R1', value: 10 },
+                { id: 2, label: 'R2', value: 20 },
+                { id: 3, label: 'R3', value: 30 }
+            ];
+            renderCircuitSandbox();
+            circuitRecalculate();
+            showNotification("Lab Cleared", "Resistors reset to default test values.", "success");
+        }
+
+        function circuitRecalculate(silent = false) {
+            if (!silent) {
+                renderCircuitSandbox();
+            }
+
+            const cType = document.querySelector('input[name="circuit-type"]:checked').value;
+            const voltage = parseFloat(document.getElementById('circuit-voltage-slider').value);
+            
+            document.getElementById('circuit-voltage-val').innerText = `${voltage}V`;
+
+            let req = 0;
+            if (sandboxResistors.length > 0) {
+                if (cType === 'series') {
+                    // Req = R1 + R2 + R3...
+                    req = sandboxResistors.reduce((acc, r) => acc + r.value, 0);
+                } else {
+                    // Req = 1 / (1/R1 + 1/R2...)
+                    const inverseSum = sandboxResistors.reduce((acc, r) => acc + (1 / r.value), 0);
+                    req = inverseSum > 0 ? 1 / inverseSum : 0;
+                }
+            }
+
+            const totalCurrent = req > 0 ? voltage / req : 0;
+
+            document.getElementById('eq-res-val').innerText = `${req.toFixed(2)} Ω`;
+            document.getElementById('total-current-val').innerText = totalCurrent > 100 ? `${(totalCurrent/1000).toFixed(2)} kA` : `${totalCurrent.toFixed(2)} A`;
+        }
+
+        // TAB 6: Quiz Database Implementation
+        const quizDatabase = [
+            {
+                q: "A copper conductor has a length of 15m and area of 1.5 mm². If the resistivity is 1.72 × 10^-8 Ω·m, calculate its resistance.",
+                options: [
+                    "0.172 Ω",
+                    "1.720 Ω",
+                    "17.20 Ω",
+                    "0.017 Ω"
+                ],
+                correct: 0,
+                explain: "Formula: R = ρ * l / A. Convert Area: 1.5 mm² = 1.5 × 10^-6 m². Therefore, R = (1.72 × 10^-8 × 15) / (1.5 × 10^-6) = 0.172 Ω.",
+                topic: "Resistivity Formula"
+            },
+            {
+                q: "If temperature rises, what happens to the electrical resistance of pure metals (PTC) and carbon (NTC) respectively?",
+                options: [
+                    "Increases, Increases",
+                    "Increases, Decreases",
+                    "Decreases, Increases",
+                    "Remains Constant"
+                ],
+                correct: 1,
+                explain: "Pure metals exhibit PTC (Positive Temp Coeff) so resistance increases. Carbon is a semiconductor-like material exhibiting NTC, meaning resistance decreases as temperature rises.",
+                topic: "Temperature Coefficient"
+            },
+            {
+                q: "An aluminium wire with diameter of 1mm is in parallel with a copper wire. If they are stretched together, which parameter must be identical across both?",
+                options: [
+                    "Potential difference (Voltage drop)",
+                    "Internal current intensity",
+                    "Specific Resistance",
+                    "Lattice vibration frequency"
+                ],
+                correct: 0,
+                explain: "In any parallel configuration, the potential difference (Voltage) across all parallel branches is always completely identical.",
+                topic: "Parallel Connections"
+            },
+            {
+                q: "A resistor has bands: Red, Violet, Orange, Gold. Find the decoded resistance value.",
+                options: [
+                    "2.7 kΩ ± 10%",
+                    "27 kΩ ± 5%",
+                    "270 Ω ± 5%",
+                    "2.7 MΩ ± 1%"
+                ],
+                correct: 1,
+                explain: "Red = 2, Violet = 7, Orange = Multiplier (10^3 = 1000), Gold = ±5%. So, 27 × 1000 = 27,000 Ω = 27 kΩ ± 5%.",
+                topic: "Color Decoding"
+            },
+            {
+                q: "Three identical 30 Ω resistors are connected in a parallel configuration. What is the equivalent resistance?",
+                options: [
+                    "90 Ω",
+                    "10 Ω",
+                    "30 Ω",
+                    "15 Ω"
+                ],
+                correct: 1,
+                explain: "For identical resistors in parallel: Req = R / N. So, 30 Ω / 3 = 10 Ω.",
+                topic: "Combination Solver"
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let selectedOptionIndex = null;
+        let scoreCorrect = 0;
+        let totalAttempted = 0;
+
+        function loadQuizQuestion() {
+            const question = quizDatabase[currentQuizIndex];
+            document.getElementById('quiz-q-num').innerText = `Q. ${currentQuizIndex + 1}/${quizDatabase.length}`;
+            document.getElementById('quiz-q-topic').innerText = question.topic;
+            document.getElementById('quiz-q-text').innerText = question.q;
+
+            // Options rendering
+            const optionsBox = document.getElementById('quiz-options-box');
+            optionsBox.innerHTML = '';
+
+            question.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition font-medium text-xs flex justify-between items-center shadow-sm";
+                btn.id = `quiz-opt-${idx}`;
+                btn.onclick = () => selectQuizOption(idx);
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <i class="fa-regular fa-circle text-slate-300" id="quiz-icon-${idx}"></i>
+                `;
+                optionsBox.appendChild(btn);
+            });
+
+            // Reset UI states
+            document.getElementById('quiz-feedback-box').className = "hidden";
+            document.getElementById('quiz-next-btn').disabled = true;
+            document.getElementById('quiz-next-btn').className = "bg-slate-300 text-slate-500 text-xs font-bold py-2 px-5 rounded-lg cursor-not-allowed";
+            selectedOptionIndex = null;
+        }
+
+        function selectQuizOption(idx) {
+            if (selectedOptionIndex !== null) return; // safeguard against multiple tries
+
+            selectedOptionIndex = idx;
+            const question = quizDatabase[currentQuizIndex];
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+
+            totalAttempted++;
+            document.getElementById('quiz-total-attempted').innerText = totalAttempted;
+
+            // Highlight all options appropriately
+            question.options.forEach((opt, oIdx) => {
+                const optBtn = document.getElementById(`quiz-opt-${oIdx}`);
+                const icon = document.getElementById(`quiz-icon-${oIdx}`);
+
+                if (oIdx === question.correct) {
+                    optBtn.className = "w-full text-left p-3 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-950 font-medium text-xs flex justify-between items-center shadow-sm";
+                    icon.className = "fa-solid fa-check-circle text-emerald-600";
+                } else if (oIdx === idx) {
+                    optBtn.className = "w-full text-left p-3 rounded-lg border border-rose-300 bg-rose-50 text-rose-950 font-medium text-xs flex justify-between items-center shadow-sm";
+                    icon.className = "fa-solid fa-times-circle text-rose-600";
+                } else {
+                    optBtn.className = "w-full text-left p-3 rounded-lg border border-slate-100 bg-slate-50/50 text-slate-400 font-medium text-xs flex justify-between items-center";
+                }
+            });
+
+            // Handle Score tally
+            if (idx === question.correct) {
+                scoreCorrect++;
+                document.getElementById('quiz-score-correct').innerText = scoreCorrect;
+                
+                feedbackBox.className = "p-4 rounded-lg text-xs leading-relaxed transition-all bg-emerald-50 text-emerald-800 border border-emerald-200 block";
+                feedbackBox.innerHTML = `<strong>🎉 Correct Answer!</strong><p class="mt-1">${question.explain}</p>`;
+                showNotification("Excellent!", "You solved the problem correctly.", "success");
+            } else {
+                feedbackBox.className = "p-4 rounded-lg text-xs leading-relaxed transition-all bg-rose-50 text-rose-800 border border-rose-200 block";
+                feedbackBox.innerHTML = `<strong>⚠️ Incorrect Selection.</strong><p class="mt-1">${question.explain}</p>`;
+                showNotification("Incorrect", "Review the step-by-step physical solution.", "error");
+            }
+
+            // Enable Next btn
+            const nextBtn = document.getElementById('quiz-next-btn');
+            nextBtn.disabled = false;
+            nextBtn.className = "bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-5 rounded-lg shadow-md transition";
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex >= quizDatabase.length) {
+                currentQuizIndex = 0; // wrap loop
+                showNotification("Quiz Completed", `You scored ${scoreCorrect} out of ${quizDatabase.length} questions. Let's practice again!`, "success");
+            }
+            loadQuizQuestion();
+        }
+
+        function resetQuiz() {
+            currentQuizIndex = 0;
+            scoreCorrect = 0;
+            totalAttempted = 0;
+            document.getElementById('quiz-score-correct').innerText = 0;
+            document.getElementById('quiz-total-attempted').innerText = 0;
+            loadQuizQuestion();
+            showNotification("Quiz Reset", "Practice workbook is restarted.", "indigo");
+        }
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            // Setup microscopic wire
+            initWireCanvas();
+            updateMicroscopicParams();
+            // Start wire animation loop
+            animateWire();
+
+            // Setup Tab 2 initial solution
+            solveOhmsLaw();
+
+            // Setup tab 4 defaults
+            renderResistorDecoderOptions();
+            decodeBands();
+
+            // Setup Tab 5 default configurations
+            circuitRecalculate();
+
+            // Load standard Quiz
+            loadQuizQuestion();
+
+            // Show academic welcome
+            showNotification("Welcome MUETian!", "Applied Physics Companion is ready. Explore the microscopic labs.", "success");
+        };
+
+    </script>
+</body>
+</html>
