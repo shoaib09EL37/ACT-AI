@@ -6,16 +6,22 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
   if (!apiKey) {
-    return res.status(500).json({
+    return res.status(503).json({
       reply: 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.'
     });
   }
 
   let body = {};
   try {
-    body = req.body && typeof req.body === 'object' ? req.body : JSON.parse(req.body || '{}');
+    if (req.body && typeof req.body === 'object') {
+      body = req.body;
+    } else if (typeof req.body === 'string' && req.body) {
+      body = JSON.parse(req.body);
+    } else {
+      body = {};
+    }
   } catch (error) {
     return res.status(400).json({
       reply: 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.'
@@ -72,6 +78,8 @@ ${currentTopic}
 The student's question is:
 ${question}`;
 
+  const prompt = `${systemInstruction}\n\nPlease answer the student's question clearly and helpfully.`;
+
   try {
     const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
@@ -79,20 +87,28 @@ ${question}`;
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: systemInstruction }]
+        },
         system_instruction: {
           parts: [{ text: systemInstruction }]
         },
         contents: [
           {
             role: 'user',
-            parts: [{ text: `${systemInstruction}\n\nPlease answer the student's question clearly and helpfully.` }]
+            parts: [{ text: prompt }]
           }
-        ]
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          topP: 0.9,
+          maxOutputTokens: 400
+        }
       })
     });
 
     if (!geminiResponse.ok) {
-      throw new Error('Gemini request failed');
+      throw new Error(`Gemini request failed with ${geminiResponse.status}`);
     }
 
     const geminiData = await geminiResponse.json();
@@ -105,4 +121,4 @@ ${question}`;
       reply: 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.'
     });
   }
-}
+};
