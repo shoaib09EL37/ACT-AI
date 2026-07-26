@@ -86,43 +86,33 @@ The student's question is:
 ${question}`;
 
   const prompt = `${systemInstruction}\n\nPlease answer the student's question clearly and helpfully.`;
-  const geminiBaseEndpoint = 'https://generativelanguage.googleapis.com/v1beta2/models/gemini-2.0-flash:generateMessage';
-  const isOAuthToken = apiKey.startsWith('ya29.') || apiKey.startsWith('Bearer ');
-  const requestUrl = isOAuthToken ? geminiBaseEndpoint : `${geminiBaseEndpoint}?key=${encodeURIComponent(apiKey)}`;
-  const requestHeaders = {
-    'Content-Type': 'application/json'
-  };
-  if (isOAuthToken) {
-    requestHeaders.Authorization = apiKey.startsWith('Bearer ') ? apiKey : `Bearer ${apiKey}`;
-  }
-
-  console.log('Gemini request endpoint:', requestUrl);
-  console.log('Gemini request model: gemini-2.0-flash');
-  console.log('Gemini auth method:', isOAuthToken ? 'Bearer token' : 'API key query parameter');
-
-  try {
-    const requestPayload = {
-      prompt: {
-        messages: [
+  const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const requestPayload = {
+    contents: [
+      {
+        role: 'user',
+        parts: [
           {
-            author: 'system',
-            content: [{ type: 'text', text: systemInstruction }]
-          },
-          {
-            author: 'user',
-            content: [{ type: 'text', text: prompt }]
+            text: prompt
           }
         ]
-      },
-      temperature: 0.7,
-      topP: 0.9,
-      maxOutputTokens: 400
-    };
+      }
+    ],
+    generationConfig: {
+      maxOutputTokens: 500,
+      temperature: 0.7
+    }
+  };
 
-    console.log('Gemini request payload keys:', Object.keys(requestPayload));
-    const geminiResponse = await fetch(requestUrl, {
+  console.log('Gemini request endpoint:', geminiEndpoint);
+  console.log('Gemini request model: gemini-2.0-flash');
+
+  try {
+    const geminiResponse = await fetch(geminiEndpoint, {
       method: 'POST',
-      headers: requestHeaders,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(requestPayload)
     });
 
@@ -147,11 +137,7 @@ ${question}`;
       });
     }
 
-    const reply = geminiData?.candidates?.[0]?.content?.[0]?.text
-      || geminiData?.message?.content?.[0]?.text
-      || geminiData?.response?.output?.[0]?.content?.[0]?.text
-      || geminiData?.output?.[0]?.content?.[0]?.text
-      || 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.';
+    const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.';
 
     return res.status(200).json({ reply });
   } catch (error) {
