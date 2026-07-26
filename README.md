@@ -144,7 +144,7 @@ The project is deployed on Vercel. To enable the live AI tutor, add the `GEMINI_
 The screenshots folder contains example assets:
 
 - screenshots/Working 1.png
-- [screenshots/Working 2.png](screenshots/Working 2.png)
+- [screenshots/home.png](screenshots/home.png)
 - [screenshots/Working 3.png](screenshots/Working 3.png)
 
 ## 14. Application Architecture
