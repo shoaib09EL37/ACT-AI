@@ -611,8 +611,8 @@
                         <!-- Spec resistance -->
                         <div class="border-b border-indigo-900 pb-3 space-y-1">
                             <span class="font-mono text-emerald-400 font-bold block">Resistivity Equation:</span>
-                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$R = \rho \frac{l}{A}$</div>
-                            <p class="text-[10px] leading-relaxed">Where $R$ is Resistance ($\Omega$), $\rho$ is Specific Resistance ($\Omega\cdot\text{m}$), $l$ is conductor length ($\text{m}$), and $A$ is cross-sectional Area ($\text{m}^2$).</p>
+                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$R = \rho \frac{L}{A}$</div>
+                            <p class="text-[10px] leading-relaxed">Where $R$ is Resistance ($\Omega$), $\rho$ is Specific Resistance ($\Omega\cdot\text{m}$), $L$ is conductor length ($\text{m}$), and $A$ is cross-sectional Area ($\text{m}^2$).</p>
                         </div>
 
                         <!-- Tempt coeff -->
@@ -1621,6 +1621,59 @@
             }
         }
 
+        function sanitizeTutorReply(text) {
+            if (typeof text !== 'string') return text;
+            let cleaned = text;
+            cleaned = cleaned.replace(/\\cdot/g, '·');
+            cleaned = cleaned.replace(/\\times/g, 'x');
+            cleaned = cleaned.replace(/\\Omega/g, 'Ω');
+            cleaned = cleaned.replace(/\\mu/g, 'μ');
+            cleaned = cleaned.replace(/\\circ/g, '°');
+            cleaned = cleaned.replace(/\\text\{([^}]+)\}/g, '$1');
+            cleaned = cleaned.replace(/\\mathrm\{([^}]+)\}/g, '$1');
+            cleaned = cleaned.replace(/\\left/g, '');
+            cleaned = cleaned.replace(/\\right/g, '');
+            cleaned = cleaned.replace(/\\ /g, ' ');
+            cleaned = cleaned.replace(/\$\$?([^$]+)\$\$?/g, '$1');
+            cleaned = cleaned.replace(/\^\{([^}]+)\}/g, '^$1');
+            cleaned = cleaned.replace(/\_\{([^}]+)\}/g, '_$1');
+            cleaned = cleaned.replace(/\^/g, '^');
+            cleaned = cleaned.replace(/\_/g, '_');
+            cleaned = cleaned.replace(/\\/g, '');
+            cleaned = cleaned.replace(/\s+/g, ' ');
+            return cleaned.trim();
+        }
+
+        function testSanitizeTutorReply() {
+            const sample = `Hello! I am ACT AI, your Applied Physics and Electrical Engineering tutor. Let's break down your current results from the **Microscopic Resistor Lab** using the live simulation values.
+
+Here is the data from your current simulation:
+* **Material:** Copper
+* **Resistivity ($\\rho$):** $1.72 \\times 10^{-8} \\ \Omega\\cdot\\text{m}$
+* **Length ($L$):** $10 \\text{m}$
+* **Cross-sectional Area ($A$):** $2.5 \\text{m}^2$
+* **Temperature ($T$):** $20 \\ ^\\circ\\text{C}$
+* **Applied Voltage ($V$):** $5 \\text{V}$
+* **Resistance ($R$):** $0.0688 \\Omega$
+* **Current ($I$):** $72.67 \\text{A}$
+
+First, let's look at how your resistor's physical dimensions and material properties determine its total resistance. The relevant equation relating resistance to resistivity, length, and cross-sectional area is:
+
+$$R = \\rho \\frac{L}{A}$$
+
+Where:
+* $R$ = Resistance ($\\Omega$)
+* $\\rho$ = Resistivity of the material ($\\Omega\\cdot\\text{m}$)
+* $L$ = Length of the conductor ($\\text{m}$)
+* $A$ = Cross-sectional area ($\\text{m}^2$)
+
+Let's plug in your simulation values:
+$$R = (1.72 \\times 10^{-8} \\Omega\\cdot\\text{m}) \\frac{10 \\text{m}}{2.5 \\text{m}^2}$$
+$$R = 1.72 \\times 10^{-8} \\times 4 = 6.88 \\times 10^{-8} \\Omega$$`;
+            console.log('Sanitized tutor reply sample:', sanitizeTutorReply(sample));
+            return sanitizeTutorReply(sample);
+        }
+
         async function sendAiTutorRequest(question, currentTopic, simulationContext) {
             setAiTutorState(true, 'Preparing a guided explanation...');
 
@@ -1638,7 +1691,8 @@
                 });
 
                 const data = await response.json();
-                const reply = data.reply || 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.';
+                const rawReply = data.reply || 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.';
+                const reply = sanitizeTutorReply(rawReply);
 
                 document.getElementById('ai-response').innerText = reply;
                 document.getElementById('ai-status').innerText = 'Tutor response ready.';
