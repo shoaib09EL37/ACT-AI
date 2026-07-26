@@ -86,7 +86,7 @@ The student's question is:
 ${question}`;
 
   const prompt = `${systemInstruction}\n\nPlease answer the student's question clearly and helpfully.`;
-  const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${encodeURIComponent(apiKey)}`;
   const requestPayload = {
     contents: [
       {
@@ -105,7 +105,7 @@ ${question}`;
   };
 
   console.log('Gemini request endpoint:', geminiEndpoint);
-  console.log('Gemini request model: gemini-2.5-flash');
+  console.log('Gemini request model: gemini-3.5-flash-lite');
 
   try {
     const geminiResponse = await fetch(geminiEndpoint, {
