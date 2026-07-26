@@ -11,10 +11,11 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+  const apiKey = process.env.GEMINI_API_KEY;
+  console.log('Gemini API key configured:', Boolean(apiKey));
   if (!apiKey) {
-    console.error('Missing Gemini API key');
     return res.status(503).json({
+      error: 'Missing Gemini API key',
       reply: 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.'
     });
   }
