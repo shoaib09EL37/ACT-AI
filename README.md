@@ -20,7 +20,7 @@ First-year engineering students often memorize formulas but struggle to connect 
 
 The live deployment is available at:
 
-[https://act-ai-3yqr-fhnxo7pot-act22.vercel.app/](https://act-ai-3yqr-fhnxo7pot-act22.vercel.app/)
+(https://act-ai-3yqr.vercel.app/)
 
 ## 5. GitHub Repository
 
@@ -143,9 +143,9 @@ The project is deployed on Vercel. To enable the live AI tutor, add the `GEMINI_
 
 The screenshots folder contains example assets:
 
+- screenshots/Working 1.png
 - [screenshots/home.png](screenshots/home.png)
-- [screenshots/simulation.png](screenshots/simulation.png)
-- [screenshots/ai-tutor.png](screenshots/ai-tutor.png)
+- [screenshots/Working 3.png](screenshots/Working 3.png)
 
 ## 14. Application Architecture
 
