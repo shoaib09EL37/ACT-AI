@@ -6,6 +6,6 @@
     "dotenv": "^16.4.5"
   },
   "scripts": {
-    "build": "node -e \"const fs=require('fs'); const path=require('path'); const out='public'; fs.mkdirSync(out,{recursive:true}); fs.copyFileSync('index.html', path.join(out,'index.html'));\""
+    "build": "node build.js"
   }
 }
