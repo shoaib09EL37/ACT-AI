@@ -20,7 +20,7 @@ First-year engineering students often memorize formulas but struggle to connect 
 
 The live deployment is available at:
 
-[[https://act-ai-3yqr-fhnxo7pot-act22.vercel.app/](https://act-ai-3yqr-fhnxo7pot-act22.vercel.app/)](https://act-ai-3yqr.vercel.app/)
+(https://act-ai-3yqr.vercel.app/)
 
 ## 5. GitHub Repository
 
