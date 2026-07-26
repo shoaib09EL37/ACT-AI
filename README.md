@@ -137,7 +137,7 @@ Do not commit `.env.local`.
 
 ## 12. Deployment
 
-The project is deployed on Vercel. To enable the live AI tutor, add the `GEMINI_API_KEY` environment variable in the Vercel dashboard and redeploy the project.
+The project is deployed on Vercel. To enable the live AI tutor, add the `GEMINI_API_KEY` environment variable in the Vercel dashboard and redeploy the project. The `.env.local` file should contain only local development variables and must not be used to store secrets for the public deployment.
 
 ## 13. Screenshots
 

@@ -1,3 +1,8 @@
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -90,9 +95,6 @@ ${question}`;
         systemInstruction: {
           parts: [{ text: systemInstruction }]
         },
-        system_instruction: {
-          parts: [{ text: systemInstruction }]
-        },
         contents: [
           {
             role: 'user',
@@ -108,6 +110,8 @@ ${question}`;
     });
 
     if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error('Gemini request failed', geminiResponse.status, errorText);
       throw new Error(`Gemini request failed with ${geminiResponse.status}`);
     }
 
