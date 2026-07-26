@@ -190,7 +190,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-lg font-extrabold text-slate-900">Atomic Resistance Simulator</h2>
-                            <p class="text-xs text-slate-500">Formulate specific resistance dynamics using $R = \rho \frac{l}{A}$ with an interactive microscopic electron drift view.</p>
+                            <p class="text-xs text-slate-500">Formulate specific resistance dynamics using R = ρ · L / A with an interactive microscopic electron drift view.</p>
                         </div>
                         <span class="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold py-1 px-3 rounded-full uppercase tracking-wider">Lab-05 Tool</span>
                     </div>
@@ -333,7 +333,7 @@
                 <div id="panel-temp" class="glass-panel p-6 rounded-2xl shadow-sm space-y-6 hidden">
                     <div>
                         <h2 class="text-lg font-extrabold text-slate-900">Thermal Resistance Chamber</h2>
-                        <p class="text-xs text-slate-500">Examine how temperature fluctuations change resistivity according to $R_t = R_0[1 + \alpha_0 (t_2 - t_1)]$. See PTC and NTC transitions.</p>
+                        <p class="text-xs text-slate-500">Examine how temperature fluctuations change resistivity according to R_t = R_0 [1 + α_0 (t_2 - t_1)]. See PTC and NTC transitions.</p>
                     </div>
 
                     <!-- Real-time Plot Card -->
@@ -559,7 +559,7 @@
                             <input type="checkbox" id="check-ohms" class="h-4 w-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500" disabled>
                             <div>
                                 <p class="font-bold text-slate-900">Ohm's Law Verification</p>
-                                <p class="text-slate-400">Solve $V/I=R$ proportionality.</p>
+                                <p class="text-slate-400">Solve V / I = R proportionality.</p>
                             </div>
                         </div>
 
@@ -611,22 +611,22 @@
                         <!-- Spec resistance -->
                         <div class="border-b border-indigo-900 pb-3 space-y-1">
                             <span class="font-mono text-emerald-400 font-bold block">Resistivity Equation:</span>
-                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$R = \rho \frac{L}{A}$</div>
-                            <p class="text-[10px] leading-relaxed">Where $R$ is Resistance ($\Omega$), $\rho$ is Specific Resistance ($\Omega\cdot\text{m}$), $L$ is conductor length ($\text{m}$), and $A$ is cross-sectional Area ($\text{m}^2$).</p>
+                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">R = ρ L / A</div>
+                            <p class="text-[10px] leading-relaxed">Where R is Resistance (Ω), ρ is Specific Resistance (Ω·m), L is conductor length (m), and A is cross-sectional Area (m²).</p>
                         </div>
 
                         <!-- Tempt coeff -->
                         <div class="border-b border-indigo-900 pb-3 space-y-1">
                             <span class="font-mono text-emerald-400 font-bold block">Temperature Variation:</span>
-                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$R_t = R_0 (1 + \alpha_0 t)$</div>
-                            <p class="text-[10px] leading-relaxed">Where $\alpha_0$ is temperature coefficient ($/^{\circ}\text{C}$) at reference point $0^{\circ}\text{C}$. For standard Copper, $\alpha_0 = 1/234.5 \approx 0.00427/^{\circ}\text{C}$.</p>
+                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">R_t = R_0 (1 + α_0 t)</div>
+                            <p class="text-[10px] leading-relaxed">Where α_0 is temperature coefficient (/°C) at reference point 0°C. For standard Copper, α_0 = 1/234.5 ≈ 0.00427/°C.</p>
                         </div>
 
                         <!-- Drift speed -->
                         <div class="space-y-1">
                             <span class="font-mono text-emerald-400 font-bold block">Electron Drift Velocity:</span>
-                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">$v_d = \frac{I}{n \cdot e \cdot A}$</div>
-                            <p class="text-[10px] leading-relaxed">Where $n$ is carrier concentration, $e$ is electronic charge ($1.6 \times 10^{-19}\,\text{C}$), and $v_d$ is the very slow axial drift speed of free carriers.</p>
+                            <div class="text-sm font-extrabold text-white my-1 bg-indigo-900/40 p-2 rounded font-mono select-all">v_d = I / (n · e · A)</div>
+                            <p class="text-[10px] leading-relaxed">Where n is carrier concentration, e is electronic charge (1.6 × 10⁻¹⁹ C), and v_d is the very slow axial drift speed of free carriers.</p>
                         </div>
                     </div>
                 </div>
