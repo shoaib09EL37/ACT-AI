@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "serve .",
-    "build": "echo \"No build step for static site\""
-  },
-  "devDependencies": {
-    "serve": "^14.2.0"
+    "build": "node -e \"const fs=require('fs'); const path=require('path'); const out='public'; fs.mkdirSync(out,{recursive:true}); fs.copyFileSync('index.html', path.join(out,'index.html'));\""
   }
 }

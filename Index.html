@@ -571,6 +571,32 @@
                     </div>
                 </div>
 
+                <!-- ACT AI Tutor -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="text-md font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-robot text-indigo-900"></i> ACT AI Tutor
+                        </h3>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">Secure Gemini</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Ask questions about the current concept, or have the tutor explain your live simulation result.</p>
+
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500" for="ai-question-input">Question</label>
+                    <input id="ai-question-input" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Why did the current change?" />
+
+                    <div class="flex flex-wrap gap-2">
+                        <button id="ai-ask-btn" onclick="askAiTutor()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> Ask ACT AI
+                        </button>
+                        <button id="ai-explain-btn" onclick="explainMyResult()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-lightbulb mr-1"></i> Explain My Result
+                        </button>
+                    </div>
+
+                    <div id="ai-status" class="text-[11px] text-slate-500">The tutor uses your current simulation values when you ask for an explanation.</div>
+                    <div id="ai-response" class="min-h-[140px] rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">The AI tutor will respond here with a guided explanation.</div>
+                </div>
+
                 <!-- Formulations Reference Sheet -->
                 <div class="bg-gradient-to-br from-indigo-950 to-slate-950 text-white rounded-2xl p-6 shadow-xl space-y-4 relative overflow-hidden">
                     <div class="absolute -right-16 -bottom-16 w-44 h-44 bg-indigo-500/10 rounded-full blur-2xl"></div>
@@ -1501,6 +1527,123 @@
             document.getElementById('quiz-total-attempted').innerText = 0;
             loadQuizQuestion();
             showNotification("Quiz Reset", "Practice workbook is restarted.", "indigo");
+        }
+
+        function getCurrentTopicLabel() {
+            switch (activeTab) {
+                case 'micro': return 'Microscopic Resistor Lab';
+                case 'ohms': return 'Ohm\'s Law Playground';
+                case 'temp': return 'Temperature Chamber';
+                case 'colors': return 'Resistor Color Decoder';
+                case 'sandbox': return 'Series/Parallel Solver';
+                case 'quiz': return 'Exam Prep Quiz';
+                default: return 'Applied Physics';
+            }
+        }
+
+        function getCurrentSimulationSnapshot() {
+            const snapshot = { topic: getCurrentTopicLabel() };
+
+            if (activeTab === 'micro') {
+                snapshot.material = materialName;
+                snapshot.resistivity = specResistivity;
+                snapshot.length = lengthParam;
+                snapshot.area = areaParam;
+                snapshot.voltage = voltageParam;
+                snapshot.resistance = resistanceParam;
+                snapshot.current = currentParam;
+                snapshot.temperature = referenceTemp;
+            } else if (activeTab === 'ohms') {
+                const voltage = parseFloat(document.getElementById('slider-ohms-v').value);
+                const resistance = parseFloat(document.getElementById('slider-ohms-r').value);
+                snapshot.voltage = voltage;
+                snapshot.resistance = resistance;
+                snapshot.current = voltage / resistance;
+            } else if (activeTab === 'temp') {
+                const r0 = parseFloat(document.getElementById('temp-r0').value);
+                const temp = parseFloat(document.getElementById('temp-t').value);
+                const alpha = getSelectedAlpha();
+                snapshot.referenceResistance = r0;
+                snapshot.temperature = temp;
+                snapshot.alpha = alpha;
+                snapshot.currentResistance = r0 * (1 + alpha * temp);
+            } else if (activeTab === 'colors') {
+                snapshot.decodedResistance = document.getElementById('decoded-res-val').innerText;
+                snapshot.tolerance = document.getElementById('decoded-tol-val').innerText;
+            } else if (activeTab === 'sandbox') {
+                snapshot.voltage = parseFloat(document.getElementById('circuit-voltage-slider').value);
+                snapshot.equivalentResistance = parseFloat(document.getElementById('eq-res-val').innerText);
+                snapshot.totalCurrent = document.getElementById('total-current-val').innerText;
+            } else if (activeTab === 'quiz') {
+                snapshot.questionText = document.getElementById('quiz-q-text').innerText;
+            }
+
+            return snapshot;
+        }
+
+        function setAiTutorState(isLoading, message) {
+            const askBtn = document.getElementById('ai-ask-btn');
+            const explainBtn = document.getElementById('ai-explain-btn');
+            const status = document.getElementById('ai-status');
+            const response = document.getElementById('ai-response');
+
+            askBtn.disabled = isLoading;
+            explainBtn.disabled = isLoading;
+            status.innerText = message;
+
+            if (isLoading) {
+                response.innerText = 'Thinking carefully about your question...';
+            }
+        }
+
+        async function sendAiTutorRequest(question, currentTopic, simulationContext) {
+            setAiTutorState(true, 'Preparing a guided explanation...');
+
+            try {
+                const response = await fetch('/api/ask-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        question,
+                        currentTopic,
+                        simulationContext
+                    })
+                });
+
+                const data = await response.json();
+                const reply = data.reply || 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.';
+
+                document.getElementById('ai-response').innerText = reply;
+                document.getElementById('ai-status').innerText = 'Tutor response ready.';
+            } catch (error) {
+                document.getElementById('ai-response').innerText = 'AI Tutor is temporarily unavailable. You can continue using the interactive simulations.';
+                document.getElementById('ai-status').innerText = 'The tutor could not be reached right now.';
+            } finally {
+                setAiTutorState(false, 'Ready to help with your next question.');
+            }
+        }
+
+        function askAiTutor() {
+            const input = document.getElementById('ai-question-input');
+            const question = input.value.trim();
+
+            if (!question) {
+                document.getElementById('ai-response').innerText = 'Type a question to start the AI tutor.';
+                return;
+            }
+
+            const currentTopic = getCurrentTopicLabel();
+            const simulationContext = getCurrentSimulationSnapshot();
+            sendAiTutorRequest(question, currentTopic, simulationContext);
+        }
+
+        function explainMyResult() {
+            const currentTopic = getCurrentTopicLabel();
+            const simulationContext = getCurrentSimulationSnapshot();
+            const question = `Explain my current result for ${currentTopic} using the live values from the simulation. Highlight the relevant equation and the physical meaning of the numbers.`;
+            sendAiTutorRequest(question, currentTopic, simulationContext);
         }
 
         // Initialize App on Window Load
