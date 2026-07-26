@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Applied Physics (EL-112) - Interactive Resistance Tutor | MUET Jamshoro</title>
+    <meta name="description" content="ACT AI is an AI-powered interactive learning environment for first-year electrical engineering and applied physics students.">
+    <meta name="keywords" content="ACT AI, electrical engineering, applied physics, ohms law, AI tutor, interactive simulations">
+    <title>ACT AI — Adaptive Circuit & Theory Tutor</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -64,11 +66,11 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Mehran University of Engineering & Technology</h1>
+                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">ACT AI — Adaptive Circuit & Theory Tutor</h1>
                         <p class="text-xs sm:text-sm text-indigo-200 font-semibold tracking-wider uppercase flex items-center gap-2">
-                            <span>Department of Electrical Engineering</span>
+                            <span>Interactive Physics Simulations + AI-Powered Engineering Tutoring</span>
                             <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span>Applied Physics (EL-112)</span>
+                            <span>Applied Physics & Electrical Engineering Learning Lab</span>
                         </p>
                     </div>
                 </div>
@@ -146,8 +148,8 @@
                     <i class="fa-solid fa-graduation-cap text-lg animate-pulse"></i>
                 </span>
                 <div>
-                    <p class="text-sm font-semibold text-indigo-950">Applied Physics Interactive Simulator Corner</p>
-                    <p class="text-xs text-indigo-700">Designed to supplement lecture notes and lab experiments on Resistance and Ohm's Law. Approved under MUET academic plan 2026-27.</p>
+                    <p class="text-sm font-semibold text-indigo-950">ACT AI Interactive Physics Learning Lab</p>
+                    <p class="text-xs text-indigo-700">An AI-powered environment for exploring resistance, Ohm's Law, temperature effects, and circuit behavior with guided tutoring.</p>
                 </div>
             </div>
             <button onclick="this.parentElement.remove()" class="text-indigo-400 hover:text-indigo-600 transition-colors">
@@ -593,6 +595,7 @@
                         </button>
                     </div>
 
+                    <div id="ai-context-summary" class="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-900"></div>
                     <div id="ai-status" class="text-[11px] text-slate-500">The tutor uses your current simulation values when you ask for an explanation.</div>
                     <div id="ai-response" class="min-h-[140px] rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">The AI tutor will respond here with a guided explanation.</div>
                 </div>
@@ -691,6 +694,7 @@
             if (tabId === 'colors') {
                 renderResistorDecoderOptions();
             }
+            updateAiContextSummary();
         }
 
         // Syllabus Panel Toggle
@@ -957,6 +961,7 @@
 
             // Check progress trigger
             document.getElementById('check-ohms').checked = true;
+            updateAiContextSummary();
 
             // Reinitialize lattice structures if Area threshold is changed significantly
             if (atoms.length !== Math.min(6, Math.max(2, Math.floor(areaParam * 0.8))) * 15) {
@@ -989,6 +994,7 @@
             document.getElementById('v-letter').style.fontSize = `${sizeV}rem`;
             document.getElementById('r-letter').style.fontSize = `${sizeR}rem`;
             document.getElementById('i-letter').style.fontSize = `${sizeI}rem`;
+            updateAiContextSummary();
         }
 
         // TAB 3: Thermal Chamber Charting logic
@@ -1120,6 +1126,7 @@
             }
 
             document.getElementById('check-temp').checked = true;
+            updateAiContextSummary();
         }
 
         // TAB 4: Resistor color decoder implementation
@@ -1260,6 +1267,7 @@
             document.getElementById('decoded-tol-val').innerText = `±${tolerance}%`;
 
             document.getElementById('check-color').checked = true;
+            updateAiContextSummary();
         }
 
         // TAB 5: Circuit Sandbox simulator
@@ -1364,6 +1372,7 @@
 
             document.getElementById('eq-res-val').innerText = `${req.toFixed(2)} Ω`;
             document.getElementById('total-current-val').innerText = totalCurrent > 100 ? `${(totalCurrent/1000).toFixed(2)} kA` : `${totalCurrent.toFixed(2)} A`;
+            updateAiContextSummary();
         }
 
         // TAB 6: Quiz Database Implementation
@@ -1581,6 +1590,22 @@
             return snapshot;
         }
 
+        function updateAiContextSummary() {
+            const contextBox = document.getElementById('ai-context-summary');
+            const snapshot = getCurrentSimulationSnapshot();
+            const lines = [];
+
+            lines.push(`Current Topic: ${snapshot.topic}`);
+            if (snapshot.voltage !== undefined) lines.push(`Voltage: ${snapshot.voltage.toFixed(2)} V`);
+            if (snapshot.resistance !== undefined) lines.push(`Resistance: ${snapshot.resistance.toFixed(2)} Ω`);
+            if (snapshot.current !== undefined) lines.push(`Current: ${snapshot.current.toFixed(2)} A`);
+            if (snapshot.temperature !== undefined) lines.push(`Temperature: ${snapshot.temperature.toFixed(0)} °C`);
+            if (snapshot.decodedResistance) lines.push(`Decoded Resistance: ${snapshot.decodedResistance}`);
+            if (snapshot.equivalentResistance !== undefined) lines.push(`Equivalent Resistance: ${snapshot.equivalentResistance}`);
+
+            contextBox.innerText = lines.join('\n');
+        }
+
         function setAiTutorState(isLoading, message) {
             const askBtn = document.getElementById('ai-ask-btn');
             const explainBtn = document.getElementById('ai-explain-btn');
@@ -1636,12 +1661,14 @@
 
             const currentTopic = getCurrentTopicLabel();
             const simulationContext = getCurrentSimulationSnapshot();
+            updateAiContextSummary();
             sendAiTutorRequest(question, currentTopic, simulationContext);
         }
 
         function explainMyResult() {
             const currentTopic = getCurrentTopicLabel();
             const simulationContext = getCurrentSimulationSnapshot();
+            updateAiContextSummary();
             const question = `Explain my current result for ${currentTopic} using the live values from the simulation. Highlight the relevant equation and the physical meaning of the numbers.`;
             sendAiTutorRequest(question, currentTopic, simulationContext);
         }
@@ -1667,8 +1694,10 @@
             // Load standard Quiz
             loadQuizQuestion();
 
+            updateAiContextSummary();
+
             // Show academic welcome
-            showNotification("Welcome MUETian!", "Applied Physics Companion is ready. Explore the microscopic labs.", "success");
+            showNotification("Welcome to ACT AI!", "Your adaptive physics tutor is ready. Explore the labs and ask for guidance.", "success");
         };
 
         

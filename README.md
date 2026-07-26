@@ -1,28 +1,57 @@
-# ACT-AI — MUET Resistance Tutor
+# ACT AI — Adaptive Circuit & Theory Tutor
 
-An interactive, static HTML simulator and learning aid for resistance, Ohm's law, resistor color codes, and series/parallel networks. The app now also includes a secure ACT AI tutor that uses Google Gemini from a serverless Vercel function.
+ACT AI is an AI-powered interactive learning environment for first-year Electrical Engineering and Applied Physics students. It combines interactive physics simulations with a context-aware AI tutor so students can explore electrical concepts, test ideas, and receive guided explanations based on their current experiment values.
 
-## Features
+## 1. What the App Does
 
-- Atomic resistance simulator with microscopic electron drift visualization
-- Ohm's Law playground and series/parallel solver
-- Resistor color decoder and exam-prep quiz
-- Temperature chamber with Chart.js visualizations
-- Secure ACT AI tutor powered by Gemini through a server-side API route
-- Clean, responsive UI built with Tailwind CSS
+ACT AI helps students understand electrical engineering concepts through interactive simulations and an AI tutor. Instead of only memorizing equations, learners can adjust voltage, resistance, temperature, and circuit parameters to see what changes and ask ACT AI for help with their current experiment.
 
-## Files of interest
+## 2. The Real Problem
 
-- `index.html` — main static page for the simulator and AI tutor UI
-- `api/ask-ai.js` — Vercel serverless function that calls Gemini securely
+First-year engineering students often memorize formulas but struggle to connect equations to physical meaning. Traditional calculators and lecture notes rarely explain why a result changes when a parameter is adjusted. ACT AI solves this by linking each simulation to an AI tutor that explains the result in context.
 
-## AI feature overview
+## 3. Target Users
 
-The ACT AI tutor sends the student's question, current topic, and the current simulation values to a server-side endpoint at `/api/ask-ai`. The browser never receives or exposes the Gemini API key. The only server-side environment variable used is `GEMINI_API_KEY`.
+- First-year Electrical Engineering students
+- Applied Physics students
+- Engineering students learning basic electrical concepts
 
-## AI system prompt
+## 4. Live Application
 
-The server uses the following teaching instruction for Gemini:
+The live deployment is available at:
+
+[https://act-ai-3yqr-fhnxo7pot-act22.vercel.app/](https://act-ai-3yqr-fhnxo7pot-act22.vercel.app/)
+
+## 5. GitHub Repository
+
+Public repository:
+
+[https://github.com/shoaib09EL37/ACT-AI](https://github.com/shoaib09EL37/ACT-AI)
+
+## 6. Complete Features
+
+The application currently includes:
+
+- Interactive resistance simulation
+- Resistivity calculations
+- Ohm's Law playground
+- Voltage/current/resistance relationships
+- Temperature effects on resistance
+- PTC and NTC behavior examples
+- Resistor color code decoder
+- Series and parallel resistor calculators
+- Equivalent resistance calculations
+- Exam practice quiz
+- ACT AI Tutor
+- Explain My Result
+
+## 7. AI Feature
+
+ACT AI uses the current simulation values to provide contextual explanations. When a student asks a question or clicks Explain My Result, the app sends the current topic and live simulation context to a secure server-side API route. The AI tutor then explains the concept, the equation, and the physical meaning of the result.
+
+## 8. AI System Prompt
+
+The application uses the following system prompt with Gemini:
 
 ```text
 You are ACT AI, an adaptive Applied Physics and Electrical Engineering tutor for first-year engineering students.
@@ -42,10 +71,10 @@ Supported topics include:
 
 Teaching rules:
 1. Explain concepts clearly using appropriate first-year engineering terminology.
-2. Connect explanations to the student's current simulation values when provided.
+2. Always connect explanations to the student's current simulation values when those values are provided.
 3. Show the relevant equation before performing calculations.
 4. Explain the physical meaning of the result, not only the numerical answer.
-5. Use SI units and clearly identify variables.
+5. Use SI units and clearly identify all variables.
 6. When a student makes a mistake, identify the likely conceptual or mathematical error and guide the student toward correction.
 7. Prefer hints and step-by-step reasoning before immediately revealing the final answer.
 8. Never invent experimental results or values that were not provided.
@@ -53,57 +82,106 @@ Teaching rules:
 10. For practice questions, do not reveal the answer immediately.
 11. When evaluating a student's answer, explain what was correct, identify errors, and provide a short improvement suggestion.
 12. If a question is outside the supported topics, politely state that it is outside the current learning module.
+
+Current topic:
+{currentTopic}
+
+Current simulation context:
+{simulationContext}
+
+Student question:
+{question}
 ```
 
-## Gemini integration and security
+## 9. Tools, Services, and Models
 
-- The Gemini API key is stored only in the environment variable `GEMINI_API_KEY`.
-- The key is read inside the serverless function at `api/ask-ai.js`.
-- The frontend contains no Gemini API key, secret token, or browser-side key exposure.
+The project uses:
 
-## Run locally
+- HTML
+- CSS
+- JavaScript
+- Tailwind CSS
+- Chart.js
+- Font Awesome
+- VS Code
+- GitHub
+- Vercel
+- Google Gemini API
+- Gemini model: `gemini-2.0-flash`
 
-1. Install dependencies if needed:
+## 10. Security
 
-```powershell
+The Gemini API key is stored as a server-side environment variable named `GEMINI_API_KEY`. It is never committed to the public repository or embedded in the frontend source.
+
+## 11. How to Run Locally
+
+```bash
+git clone https://github.com/shoaib09EL37/ACT-AI.git
+cd ACT-AI
 npm install
 ```
 
-2. Start a local static server and the Vercel-compatible API route. A simple option is to use Vercel CLI if available:
+Create a local environment file named `.env.local` and add:
 
-```powershell
+```text
+GEMINI_API_KEY=your_api_key_here
+```
+
+Then run:
+
+```bash
 npx vercel dev
 ```
 
-3. Open the local URL shown by Vercel CLI to use the simulator and AI tutor.
+Do not commit `.env.local`.
 
-## Secure environment variable setup
+## 12. Deployment
 
-Before deploying, create a Vercel environment variable named `GEMINI_API_KEY` and set it to your Gemini API key.
+The project is deployed on Vercel. To enable the live AI tutor, add the `GEMINI_API_KEY` environment variable in the Vercel dashboard and redeploy the project.
 
-For local development, set the same variable in your shell before running the app:
+## 13. Screenshots
 
-```powershell
-$env:GEMINI_API_KEY="your_gemini_api_key_here"
+The screenshots folder contains example assets:
+
+- [screenshots/home.png](screenshots/home.png)
+- [screenshots/simulation.png](screenshots/simulation.png)
+- [screenshots/ai-tutor.png](screenshots/ai-tutor.png)
+
+## 14. Application Architecture
+
+```text
+Student
+↓
+ACT AI Frontend
+↓
+Interactive Simulation
+↓
+Current Simulation Context
+↓
+Secure API Route
+↓
+Gemini AI
+↓
+Personalized Explanation
 ```
 
-## Deploy with Vercel
+## 15. Future Improvements
 
-1. Sign in to Vercel and import the GitHub repository.
-2. Add the `GEMINI_API_KEY` environment variable in the Vercel project settings.
-3. Deploy the project. The `/api/ask-ai` route will be served automatically.
+- Student accounts
+- Learning progress tracking
+- AI-generated quizzes
+- AI answer evaluation
+- Instructor dashboard
+- More physics simulations
+- Personalized learning paths
 
-## Notes & Best Practices
+## 16. Author
 
-- Keep external assets on CDNs as-is for simplicity; for offline builds consider vendoring them.
-- Ensure any large assets (images) are optimized for web performance.
-- If you want a custom domain, Vercel supports DNS setup for the deployed app.
+Dr. Shoaib Ahmed Khatri
 
-## Contributing
+Assistant Professor
 
-Contributions are welcome — open an issue or submit a pull request.
+Department of Electrical Engineering
 
-## License
-
-This repository has no license specified. Add a license file (for example, `LICENSE`) if you want to allow reuse. A permissive option is the MIT License.
+Mehran University of Engineering and Technology, Jamshoro, Pakistan
 
