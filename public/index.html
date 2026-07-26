@@ -533,6 +533,33 @@
             <!-- Right-Hand Side Context Column -->
             <div class="space-y-6">
 
+                <!-- ACT AI Tutor -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <h3 class="text-md font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-robot text-indigo-900"></i> ACT AI Tutor
+                        </h3>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">Secure Gemini</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Ask questions about the current concept, or have the tutor explain your live simulation result.</p>
+
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500" for="ai-question-input">Question</label>
+                    <input id="ai-question-input" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Why did the current change?" />
+
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button id="ai-ask-btn" onclick="askAiTutor()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> Ask ACT AI
+                        </button>
+                        <button id="ai-explain-btn" onclick="explainMyResult()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-lightbulb mr-1"></i> Explain My Result
+                        </button>
+                    </div>
+
+                    <div id="ai-context-summary" class="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-900"></div>
+                    <div id="ai-status" class="text-[11px] text-slate-500">The tutor uses your current simulation values when you ask for an explanation.</div>
+                    <div id="ai-response" class="min-h-[140px] rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">The AI tutor will respond here with a guided explanation.</div>
+                </div>
+
                 <!-- Academic Progress Check -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                     <h3 class="text-md font-extrabold text-slate-900 flex items-center gap-2">
@@ -571,33 +598,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- ACT AI Tutor -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <h3 class="text-md font-extrabold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-robot text-indigo-900"></i> ACT AI Tutor
-                        </h3>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">Secure Gemini</span>
-                    </div>
-                    <p class="text-xs text-slate-500">Ask questions about the current concept, or have the tutor explain your live simulation result.</p>
-
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500" for="ai-question-input">Question</label>
-                    <input id="ai-question-input" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Why did the current change?" />
-
-                    <div class="flex flex-wrap gap-2">
-                        <button id="ai-ask-btn" onclick="askAiTutor()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-paper-plane mr-1"></i> Ask ACT AI
-                        </button>
-                        <button id="ai-explain-btn" onclick="explainMyResult()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-lightbulb mr-1"></i> Explain My Result
-                        </button>
-                    </div>
-
-                    <div id="ai-context-summary" class="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-900"></div>
-                    <div id="ai-status" class="text-[11px] text-slate-500">The tutor uses your current simulation values when you ask for an explanation.</div>
-                    <div id="ai-response" class="min-h-[140px] rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">The AI tutor will respond here with a guided explanation.</div>
                 </div>
 
                 <!-- Formulations Reference Sheet -->
