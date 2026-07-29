@@ -204,14 +204,19 @@
                     </div>
 
                     <!-- Canvas Resistor Simulation -->
-                    <div class="relative bg-slate-950 rounded-xl overflow-hidden shadow-inner border border-slate-800">
+                    <div id="wire-canvas-container" class="relative bg-slate-950 rounded-xl overflow-hidden shadow-inner border border-slate-800 transition-all duration-300" style="height: 224px;">
                         <!-- Canvas Header values overlay -->
                         <div class="absolute top-3 left-4 right-4 flex justify-between text-[11px] font-mono text-indigo-200 z-10 pointer-events-none">
                             <div>Material: <span id="overlay-material" class="text-white font-bold">Copper</span></div>
                             <div>Electron Drift velocity: <span id="overlay-speed" class="text-emerald-400 font-bold">---</span></div>
                             <div>Temperature: <span id="overlay-temp" class="text-orange-400 font-bold">20°C</span></div>
                         </div>
-                        <canvas id="wireCanvas" class="w-full h-56 block bg-slate-950"></canvas>
+                        <!-- Wire dimension indicator -->
+                        <div class="absolute top-12 left-4 text-[10px] text-indigo-300 z-10 pointer-events-none">
+                            <div>Length: <span id="overlay-length" class="text-cyan-400 font-bold">10.0 m</span></div>
+                            <div>Area: <span id="overlay-area" class="text-amber-400 font-bold">2.5 mm²</span></div>
+                        </div>
+                        <canvas id="wireCanvas" class="w-full h-full block bg-slate-950"></canvas>
                         <!-- Canvas Legend overlay -->
                         <div class="absolute bottom-3 left-4 right-4 flex gap-4 text-[10px] text-slate-400 z-10 pointer-events-none">
                             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow"></span> Lattice Cation (+)</span>
@@ -467,11 +472,19 @@
                     <div class="flex items-center gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-sm">
                         <span class="font-bold text-slate-700">Network Type:</span>
                         <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                            <input type="radio" name="circuit-type" value="series" checked class="text-indigo-600 focus:ring-indigo-500" onchange="circuitRecalculate()"> Series Combination
+                            <input type="radio" name="circuit-type" value="series" checked class="text-indigo-600 focus:ring-indigo-500" onchange="circuitRecalculate(); updateCircuitDiagram()"> Series Combination
                         </label>
                         <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                            <input type="radio" name="circuit-type" value="parallel" class="text-indigo-600 focus:ring-indigo-500" onchange="circuitRecalculate()"> Parallel Combination
+                            <input type="radio" name="circuit-type" value="parallel" class="text-indigo-600 focus:ring-indigo-500" onchange="circuitRecalculate(); updateCircuitDiagram()"> Parallel Combination
                         </label>
+                    </div>
+
+                    <!-- Interactive Circuit Diagram -->
+                    <div class="bg-gradient-to-b from-slate-100 to-slate-200 rounded-xl p-4 border border-slate-200 shadow-inner">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Circuit Diagram</div>
+                        <div id="circuit-diagram-container" class="bg-white rounded-lg p-4 min-h-[120px] flex items-center justify-center border border-slate-200">
+                            <svg id="circuit-svg" viewBox="0 0 400 100" class="w-full max-w-md h-auto"></svg>
+                        </div>
                     </div>
 
                     <!-- Resistors Grid List -->
@@ -778,10 +791,10 @@
             canvas.width = rect.width;
             canvas.height = rect.height;
 
-            // Generate atomic lattice structure based on Area
+            // Generate atomic lattice structure based on Area and Length
             atoms = [];
             const rows = Math.min(6, Math.max(2, Math.floor(areaParam * 0.8)));
-            const cols = 15;
+            const cols = Math.min(25, Math.max(5, Math.floor(lengthParam / 4)));
             const rowSpac = canvas.height / (rows + 1);
             const colSpac = canvas.width / (cols + 1);
 
@@ -970,13 +983,26 @@
             // Canvas HUD text updates
             document.getElementById('overlay-material').innerText = materialName;
             document.getElementById('overlay-speed').innerText = currentParam > 1000 ? `${(currentParam/1000).toFixed(1)} kA/m²` : `${currentParam.toFixed(2)} A/m²`;
+            
+            // Update dimension overlays
+            document.getElementById('overlay-length').innerText = lengthParam.toFixed(1) + ' m';
+            document.getElementById('overlay-area').innerText = areaParam.toFixed(1) + ' mm²';
+            
+            // Adjust canvas container height based on cross-sectional area (visual representation)
+            const container = document.getElementById('wire-canvas-container');
+            const baseHeight = 120;
+            const maxHeight = 280;
+            const newHeight = Math.min(maxHeight, Math.max(baseHeight, baseHeight + areaParam * 16));
+            container.style.height = newHeight + 'px';
 
             // Check progress trigger
             document.getElementById('check-ohms').checked = true;
             updateAiContextSummary();
 
-            // Reinitialize lattice structures if Area threshold is changed significantly
-            if (atoms.length !== Math.min(6, Math.max(2, Math.floor(areaParam * 0.8))) * 15) {
+            // Reinitialize lattice structures when params change
+            const expectedRows = Math.min(6, Math.max(2, Math.floor(areaParam * 0.8)));
+            const expectedCols = Math.min(25, Math.max(5, Math.floor(lengthParam / 4)));
+            if (atoms.length !== expectedRows * expectedCols) {
                 initWireCanvas();
             }
         }
@@ -1307,7 +1333,7 @@
                     <div>
                         <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
                             <span>Resistance value:</span>
-                            <span class="font-mono font-bold text-indigo-600">${res.value} Ω</span>
+                            <span id="res-val-${res.id}" class="font-mono font-bold text-indigo-600">${res.value} Ω</span>
                         </div>
                         <input type="range" min="1" max="100" step="1" value="${res.value}" class="w-full h-1 bg-slate-200 rounded-lg appearance-none accent-indigo-600" oninput="circuitModifyValue(${res.id}, this.value)">
                     </div>
@@ -1329,21 +1355,25 @@
             });
             renderCircuitSandbox();
             circuitRecalculate();
+            updateCircuitDiagram();
         }
 
         function circuitRemoveResistor(id) {
             sandboxResistors = sandboxResistors.filter(r => r.id !== id);
             renderCircuitSandbox();
             circuitRecalculate();
+            updateCircuitDiagram();
         }
 
         function circuitModifyValue(id, value) {
             const res = sandboxResistors.find(r => r.id === id);
             if (res) {
                 res.value = parseInt(value);
+                const label = document.getElementById('res-val-' + id);
+                if (label) label.innerText = res.value + ' Ω';
             }
-            // Silent layout label update to prevent laggy sliding
             circuitRecalculate(true);
+            updateCircuitDiagram();
         }
 
         function circuitReset() {
@@ -1354,7 +1384,72 @@
             ];
             renderCircuitSandbox();
             circuitRecalculate();
+            updateCircuitDiagram();
             showNotification("Lab Cleared", "Resistors reset to default test values.", "success");
+        }
+
+        function updateCircuitDiagram() {
+            const svg = document.getElementById('circuit-svg');
+            if (!svg) return;
+            const cType = document.querySelector('input[name="circuit-type"]:checked').value;
+            const resistors = sandboxResistors;
+            let svgContent = '';
+            
+            if (resistors.length === 0) {
+                svg.innerHTML = '<text x="200" y="55" text-anchor="middle" fill="#94a3b8" font-size="12">Add resistors to see diagram</text>';
+                return;
+            }
+            
+            if (cType === 'series') {
+                const totalWidth = 360;
+                const resistorWidth = Math.min(50, (totalWidth - 40) / resistors.length - 10);
+                const startX = (400 - (resistors.length * (resistorWidth + 10) + 30)) / 2;
+                let x = startX;
+                
+                svgContent += `<line x1="10" y1="50" x2="${x}" y2="50" stroke="#4f46e5" stroke-width="2"/>`;
+                svgContent += `<circle cx="10" cy="50" r="4" fill="#4f46e5"/>`;
+                svgContent += `<text x="10" y="75" text-anchor="middle" fill="#64748b" font-size="9">+</text>`;
+                
+                resistors.forEach((r, i) => {
+                    svgContent += `<rect x="${x}" y="40" width="${resistorWidth}" height="20" fill="#fef3c7" stroke="#d97706" stroke-width="2" rx="3"/>`;
+                    svgContent += `<text x="${x + resistorWidth/2}" y="54" text-anchor="middle" fill="#92400e" font-size="9" font-weight="bold">${r.label}</text>`;
+                    svgContent += `<text x="${x + resistorWidth/2}" y="32" text-anchor="middle" fill="#64748b" font-size="8">${r.value}Ω</text>`;
+                    x += resistorWidth;
+                    if (i < resistors.length - 1) {
+                        svgContent += `<line x1="${x}" y1="50" x2="${x + 10}" y2="50" stroke="#4f46e5" stroke-width="2"/>`;
+                        x += 10;
+                    }
+                });
+                
+                svgContent += `<line x1="${x}" y1="50" x2="390" y2="50" stroke="#4f46e5" stroke-width="2"/>`;
+                svgContent += `<circle cx="390" cy="50" r="4" fill="#4f46e5"/>`;
+                svgContent += `<text x="390" y="75" text-anchor="middle" fill="#64748b" font-size="9">-</text>`;
+            } else {
+                const centerX = 200;
+                const branchSpacing = Math.min(25, 80 / resistors.length);
+                const totalHeight = resistors.length * branchSpacing;
+                const startY = 50 - totalHeight / 2 + branchSpacing / 2;
+                
+                svgContent += `<circle cx="40" cy="50" r="4" fill="#4f46e5"/>`;
+                svgContent += `<text x="40" y="75" text-anchor="middle" fill="#64748b" font-size="9">+</text>`;
+                svgContent += `<line x1="40" y1="50" x2="80" y2="50" stroke="#4f46e5" stroke-width="2"/>`;
+                
+                resistors.forEach((r, i) => {
+                    const y = startY + i * branchSpacing;
+                    svgContent += `<line x1="80" y1="50" x2="80" y2="${y}" stroke="#4f46e5" stroke-width="2"/>`;
+                    svgContent += `<line x1="80" y1="${y}" x2="140" y2="${y}" stroke="#4f46e5" stroke-width="2"/>`;
+                    svgContent += `<rect x="140" y="${y - 8}" width="60" height="16" fill="#fef3c7" stroke="#d97706" stroke-width="2" rx="3"/>`;
+                    svgContent += `<text x="170" y="${y + 4}" text-anchor="middle" fill="#92400e" font-size="8" font-weight="bold">${r.label}: ${r.value}Ω</text>`;
+                    svgContent += `<line x1="200" y1="${y}" x2="260" y2="${y}" stroke="#4f46e5" stroke-width="2"/>`;
+                    svgContent += `<line x1="260" y1="${y}" x2="260" y2="50" stroke="#4f46e5" stroke-width="2"/>`;
+                });
+                
+                svgContent += `<line x1="260" y1="50" x2="360" y2="50" stroke="#4f46e5" stroke-width="2"/>`;
+                svgContent += `<circle cx="360" cy="50" r="4" fill="#4f46e5"/>`;
+                svgContent += `<text x="360" y="75" text-anchor="middle" fill="#64748b" font-size="9">-</text>`;
+            }
+            
+            svg.innerHTML = svgContent;
         }
 
         function circuitRecalculate(silent = false) {
@@ -1755,6 +1850,7 @@ $$R = 1.72 \\times 10^{-8} \\times 4 = 6.88 \\times 10^{-8} \\Omega$$`;
 
             // Setup Tab 5 default configurations
             circuitRecalculate();
+            updateCircuitDiagram();
 
             // Load standard Quiz
             loadQuizQuestion();
