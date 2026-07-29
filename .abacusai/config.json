@@ -40,7 +40,22 @@
       "Bash(python verify.py)",
       "Bash(del verify.py 2>&1\ndir *.py 2>&1)",
       "Bash(dir *.py)",
-      "Bash(git status)"
+      "Bash(git status)",
+      "Bash(where vercel 2>&1\nnpx --version 2>&1\nnode --version 2>&1)",
+      "Bash(node --version)",
+      "Bash(findstr /R \"^[A-Za-z_]*=\" .env.local | findstr /V \"^$\")",
+      "Bash(powershell -NoProfile -Command \"(Get-Content .env.local) | ForEach-Object { if ($_ -match '^\\s*#') { return }; if ($_ -m…)",
+      "Bash(powershell -NoProfile -Command \"Write-Output test123\")",
+      "Bash(for /f \"tokens=1 delims==\" %a in (.env.local) do @echo %a)",
+      "Bash(for /f \"tokens=1 delims==\" %i in (.env.local) do echo %i)",
+      "Bash(listenv.bat)",
+      "Bash(vercel dev --yes --listen 3000 > vercel-dev.log 2>&1 &)",
+      "Bash(type vercel-dev.log)",
+      "Bash(curl -s -o nul -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/ | findstr /C:\"ACT AI\")",
+      "Bash(curl -s http://localhost:3000/ -o response.html\nfindstr \"ACT AI\" response.html)",
+      "Bash(findstr /C:\"ACT AI\" response.html)",
+      "Bash(del response.html)"
     ]
   }
 }
