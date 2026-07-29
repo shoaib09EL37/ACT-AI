@@ -43,9 +43,17 @@
         }
         /* Active tab indicator */
         .tab-active {
-            border-color: #0d9488;
-            color: #0d9488;
-            background-color: #f0fdfa;
+            border-color: #4f46e5;
+            color: #4338ca;
+            background-color: #eef2ff;
+        }
+        /* Tab panel fade-in transition */
+        .panel-fade-in {
+            animation: panelFadeIn 0.25s ease-out;
+        }
+        @keyframes panelFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -76,9 +84,9 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="bg-indigo-800 text-indigo-100 text-xs px-3 py-1.5 rounded-lg font-mono border border-indigo-700 shadow-sm">Batch: 26EL (I, II & III)</span>
-                    <span class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow transition duration-200 cursor-help" onclick="toggleSyllabusPanel()">
+                    <button type="button" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow transition duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-300" onclick="toggleSyllabusPanel()">
                         <i class="fa-solid fa-book-open mr-1"></i> Syllabus Info
-                    </span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -681,8 +689,12 @@
             document.getElementById('tab-sandbox').classList.remove('tab-active');
             document.getElementById('tab-quiz').classList.remove('tab-active');
 
-            // Show selected panel
-            document.getElementById('panel-' + tabId).classList.remove('hidden');
+            // Show selected panel with a subtle fade-in transition
+            const shownPanel = document.getElementById('panel-' + tabId);
+            shownPanel.classList.remove('hidden');
+            shownPanel.classList.remove('panel-fade-in');
+            void shownPanel.offsetWidth; // force reflow so the animation replays
+            shownPanel.classList.add('panel-fade-in');
             document.getElementById('tab-' + tabId).classList.add('tab-active');
 
             activeTab = tabId;
@@ -1092,7 +1104,6 @@
         function updateTempParams() {
             const matSelect = document.getElementById('temp-material');
             const r0Slider = document.getElementById('temp-r0');
-            const tempSlider = document.getElementById('temp-temp'); // note we updated element id slightly in HTML inside range.
             const tSlider = document.getElementById('temp-t');
 
             const r0 = parseFloat(r0Slider.value);
